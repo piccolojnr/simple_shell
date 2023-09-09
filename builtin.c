@@ -15,6 +15,7 @@ int find_builtin(cmd_info **info)
 	builtin_table builtintbl[] = {
 		{"which", which_builtin},
 		{"exit", exit_builtin},
+		{"env", env_builtin},
 		{NULL, NULL}
 	};
 	/* find built-in command */

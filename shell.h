@@ -80,7 +80,7 @@ int find_builtin(cmd_info **);
 /* built_in */
 int which_builtin(cmd_info *);
 int exit_builtin(cmd_info *);
-
+int env_builtin(cmd_info *info);
 
 /* get_env */
 char *_getenv(const char *name);

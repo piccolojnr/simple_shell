@@ -49,11 +49,33 @@ int which_builtin(cmd_info *info)
  * @info: the parameter struct
  *
  * Return: 0 on success, 1 on failure
-*/
+ */
 int exit_builtin(cmd_info *info)
 {
 	(void)info;
 
 	exit(EXIT_SUCCESS);
 	return (EXIT_SUCCESS);
+}
+/**
+ * env_builtin - prints the current environment
+ * @info: the parameter struct
+ *
+ * Return: 0 on success, 1 on failure
+ */
+int env_builtin(cmd_info *info)
+{
+	int i;
+	(void)info;
+
+	if (environ == NULL)
+	{
+		return (1);
+	}
+	for (i = 0; environ[i] != NULL; i++)
+	{
+		printf("%s\n", environ[i]);
+	}
+
+	return (0);
 }
