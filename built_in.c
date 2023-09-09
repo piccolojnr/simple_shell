@@ -52,7 +52,21 @@ int which_builtin(cmd_info *info)
  */
 int exit_builtin(cmd_info *info)
 {
-	(void)info;
+	int exit_status;
+
+	if (info->argc > 2)
+	{
+		printf("exit: too many arguments.\n");
+		return (-2);
+	}
+
+	if (info->argc == 2)
+	{
+		exit_status = _atoi(info->argv[1]);
+		exit(exit_status);
+
+		return (EXIT_SUCCESS);
+	}
 
 	exit(EXIT_SUCCESS);
 	return (EXIT_SUCCESS);

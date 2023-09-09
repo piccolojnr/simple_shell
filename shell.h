@@ -91,5 +91,6 @@ int _unsetenv(const char *name);
 char *allocate_and_copy(const char *str, int length);
 int count_words(const char *str, char *delim);
 int is_delim(char, char *);
+int _atoi(char *s);
 
 #endif /* SHELL_H */
