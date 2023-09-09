@@ -5,12 +5,10 @@
  */
 void execute_command(cmd_info *info)
 {
-	int built_in_ret;
 	pid_t child_pid;
 
 	/* check for built ins */
-	built_in_ret = find_builtin(&info);
-	if (built_in_ret != -1)
+	if (info->is_built_in != -1)
 		return;
 	/* Fork and execute external commands */
 	child_pid = fork();

@@ -20,6 +20,7 @@
  * @argv: arguments
  * @line_len: length of line
  * @char_len: length of char in line
+ * @is_built_in: return value of built-in
  */
 typedef struct command_info
 {
@@ -30,6 +31,8 @@ typedef struct command_info
 
 	size_t line_len;
 	ssize_t char_len;
+
+	int is_built_in;
 } cmd_info;
 
 
@@ -49,7 +52,7 @@ extern char **environ;
 
 /* run_shell */
 void run_shell(void);
-char *find_executable(const char *);
+void find_executable(cmd_info **info);
 
 /* executable_cmd */
 void execute_command(cmd_info *);
@@ -75,7 +78,8 @@ int find_builtin(cmd_info **);
 
 
 /* built_in */
-int _which(cmd_info *);
+int which_builtin(cmd_info *);
+int exit_builtin(cmd_info *);
 
 
 /* get_env */

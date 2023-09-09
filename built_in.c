@@ -1,11 +1,11 @@
 #include "shell.h"
 /**
- * _which - looks for files in the current path
+ * which_builtin - looks for files in the current path
  * @info: the parameter struct
  *
  * Return: 1 if found, 0 if not
  */
-int _which(cmd_info *info)
+int which_builtin(cmd_info *info)
 {
 	int i, j, k;
 	char *path;
@@ -42,5 +42,18 @@ int _which(cmd_info *info)
 		}
 	}
 
+	return (EXIT_SUCCESS);
+}
+/**
+ * exit_builtin - exits the shell
+ * @info: the parameter struct
+ *
+ * Return: 0 on success, 1 on failure
+*/
+int exit_builtin(cmd_info *info)
+{
+	(void)info;
+
+	exit(EXIT_SUCCESS);
 	return (EXIT_SUCCESS);
 }

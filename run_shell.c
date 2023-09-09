@@ -9,7 +9,7 @@ void run_shell(void)
 
 	while (shell_status)
 	{
-		printf("$ ");
+		printf("piccolojnr$ ");
 		info->char_len = getline(&info->line, &info->line_len, stdin);
 		if ((info->char_len == -1) && (feof(stdin)))
 		{
@@ -28,7 +28,7 @@ void run_shell(void)
 			continue; /* Ignore empty lines or input errors */
 
 		/* Check if the command exists in the PATH and execute it */
-		info->path = find_executable(info->argv[0]);
+		find_executable(&info);
 		if (info->path != NULL)
 		{
 			execute_command(info);
@@ -42,25 +42,29 @@ void run_shell(void)
 
 /**
  * find_executable - Finds an executable in the PATH
- * @command: The command to find
- *
- * Return: The full path to the executable, or NULL if not found
+ * @info: A pointer to a cmd_info struct
  */
-char *find_executable(const char *command)
+void find_executable(cmd_info **info)
 {
 	int i, path_len;
 	char *path = _getenv("PATH");
 	char **path_buffer;
 	char *path_with_cmd;
 
-	if (path == NULL || command == NULL)
-		return (NULL);
+	/* check for built ins */
+	(*info)->is_built_in = find_builtin(info);
+	if ((*info)->is_built_in != -1)
+		return;
+
+	if (path == NULL || (*info)->argv[0] == NULL)
+		return;
 
 	path_len = split_str(path, &path_buffer, ":", 0);
 
 	for (i = 0; i < path_len; i++)
 	{
-		path_with_cmd = (char *)malloc(strlen(path_buffer[i]) + strlen(command) + 2);
+		path_with_cmd = (char *)malloc(strlen(path_buffer[i])
+								+ strlen((*info)->argv[0]) + 2);
 		if (path_with_cmd == NULL)
 		{
 			perror("Memory allocation error");
@@ -69,17 +73,17 @@ char *find_executable(const char *command)
 
 		path_with_cmd = _strcpy(path_with_cmd, path_buffer[i]);
 		path_with_cmd = _strcat(path_with_cmd, "/");
-		path_with_cmd = _strcat(path_with_cmd, command);
+		path_with_cmd = _strcat(path_with_cmd, (*info)->argv[0]);
 
 		if (access(path_with_cmd, X_OK) == 0)
 		{
 			free_args(path_buffer); /* Clean up the path_buffer */
-			return (path_with_cmd); /* Return the full path to the executable */
+			(*info)->path = path_with_cmd;
+			return;
 		}
 
 		free(path_with_cmd);
 	}
-
 	free_args(path_buffer); /* Clean up the path_buffer */
-	return (NULL);        /* Command not found in any PATH directory */
+	return;        /* Command not found in any PATH directory */
 }

@@ -13,7 +13,8 @@ int find_builtin(cmd_info **info)
 	int i, j, built_in_ret = -1;
 	char *env;
 	builtin_table builtintbl[] = {
-		{"_which", _which},
+		{"which", which_builtin},
+		{"exit", exit_builtin},
 		{NULL, NULL}
 	};
 	/* find built-in command */
