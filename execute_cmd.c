@@ -3,7 +3,7 @@
  * execute_command - executes a command
  * @info: command info
  */
-void execute_command(cmd_info *info)
+void execute_command(info_t *info)
 {
 	pid_t child_pid;
 
@@ -17,7 +17,7 @@ void execute_command(cmd_info *info)
 		perror("fork");
 		free(info->line);
 		free_args(info->argv);
-		exit(EXIT_FAILURE);
+		exit_shell(info, EXIT_FAILURE);
 	}
 	if (child_pid == 0)
 	{
@@ -27,7 +27,7 @@ void execute_command(cmd_info *info)
 			perror(info->argv[0]);
 			free(info->line);
 			free_args(info->argv);
-			exit(EXIT_FAILURE);
+			exit_shell(info, EXIT_FAILURE);
 		}
 	}
 	else
@@ -40,7 +40,7 @@ void execute_command(cmd_info *info)
 			perror("wait");
 			free(info->line);
 			free_args(info->argv);
-			exit(EXIT_FAILURE);
+			exit_shell(info, EXIT_FAILURE);
 		}
 	}
 }

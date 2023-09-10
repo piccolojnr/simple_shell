@@ -7,10 +7,10 @@
  * @delim: delimiter
  * @word_count: number of words
  *
- * Return: array of words
+ * Return: word_count
  */
 int split_str(char *str, char ***args, char *delim,
-				int word_count)
+			  int word_count)
 {
 	int i, count, word_index, remaining_length;
 
@@ -33,15 +33,19 @@ int split_str(char *str, char ***args, char *delim,
 			i++;
 		count = 0;
 		while ((!is_delim(str[i + count], delim) || word_index == word_count) &&
-		       str[i + count] != '\0')
+			   str[i + count] != '\0')
 			count++;
 		(*args)[word_index] = allocate_and_copy(str + i, count);
+		if ((*args)[word_index] == NULL)
+			return (-1);
 		word_index++;
 		i += count;
 		if (word_index == word_count - 1)
 		{
 			remaining_length = strlen(str + i);
 			(*args)[word_index] = allocate_and_copy(str + i + 1, remaining_length);
+			if ((*args)[word_index] == NULL)
+				return (-1);
 			break;
 		}
 	}

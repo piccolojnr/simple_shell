@@ -8,36 +8,21 @@
  *			1 if builtin found but not successful,
  *			-2 if builtin signals exit()
  */
-int find_builtin(cmd_info **info)
+int find_builtin(info_t **info)
 {
-	int i, j, built_in_ret = -1;
-	char *env;
+	int i, built_in_ret = -1;
 	builtin_table builtintbl[] = {
 		{"which", which_builtin},
 		{"exit", exit_builtin},
 		{"env", env_builtin},
 		{"setenv", setenv_builtin},
 		{"unsetenv", unsetenv_builtin},
-		{NULL, NULL}
-	};
-	/* find built-in command */
-	for (j = 0; j < (*info)->argc; j++)
-	{
-		if ((*info)->argv[j][0] == '$')
-		{
-			env = _getenv((*info)->argv[j] + 1);
-			free((*info)->argv[j]);
-			if (env)
-			{
-				(*info)->argv[j] = env;
-			}
-			else
-			{
-				(*info)->argv[j] = NULL;
-			}
-		}
-	}
+		{NULL, NULL}};
 
+	/* find and replace env var */
+	replace_env_var(info);
+
+	/* find built-in command */
 	for (i = 0; builtintbl[i].type; i++)
 	{
 		if (_strcmp((*info)->argv[0], builtintbl[i].type) == 0)
@@ -48,4 +33,33 @@ int find_builtin(cmd_info **info)
 	}
 
 	return (built_in_ret);
+}
+
+/**
+ * replace_env_var - finds and replaces environment variables
+ * with their values
+ * @info: ..
+ */
+void replace_env_var(info_t **info)
+{
+	int i;
+	char *env;
+
+	for (i = 0; i < (*info)->argc; i++)
+	{
+		if ((*info)->argv[i][0] == '$' &&
+			(*info)->argv[i][1] != '\0' && (*info)->argv[i][1] != '\n')
+		{
+			env = _getenv((*info)->argv[i] + 1);
+			free((*info)->argv[i]);
+			if (env)
+			{
+				(*info)->argv[i] = env;
+			}
+			else
+			{
+				(*info)->argv[i] = NULL;
+			}
+		}
+	}
 }

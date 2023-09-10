@@ -52,7 +52,7 @@ ssize_t _getline(char **lineptr, size_t *n, FILE *stream)
  * get_input - get input from user
  * @info: struct with variables
  */
-void get_input(cmd_info *info)
+void get_input(info_t *info)
 {
     info->char_len = getline(&info->line, &info->line_len, stdin);
     if ((info->char_len == -1))
@@ -62,7 +62,7 @@ void get_input(cmd_info *info)
             /* EOF reached, exit gracefully */
             free(info->line);
             free(info);
-            exit(EXIT_SUCCESS); /* or any other appropriate action */
+            exit_shell(info, EXIT_SUCCESS); /* or any other appropriate action */
         }
         else
         {
@@ -70,7 +70,7 @@ void get_input(cmd_info *info)
             perror("Error reading input");
             free(info->line);
             free(info);
-            exit(EXIT_FAILURE);
+            exit_shell(info, EXIT_FAILURE);
         }
     }
 }

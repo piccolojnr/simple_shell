@@ -1,5 +1,6 @@
 #include "shell.h"
 
+t_env *env_list = NULL;
 
 /**
  * main - entry point
@@ -12,6 +13,8 @@ int main(int argc, char **argv)
 {
 	(void)argc;
 	(void)argv;
+
+	create_env_list();
 
 	run_shell();
 	return (EXIT_SUCCESS);

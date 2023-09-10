@@ -5,7 +5,7 @@
 void run_shell(void)
 {
 	int shell_status = 1;
-	cmd_info *info = malloc(sizeof(cmd_info));
+	info_t *info = malloc(sizeof(info_t));
 
 	while (shell_status)
 	{
@@ -33,14 +33,14 @@ void run_shell(void)
 			printf("%s: command not found\n", info->argv[0]);
 	}
 
-	free(info->line);
+	exit_shell(info, EXIT_SUCCESS);
 }
 
 /**
  * find_executable - Finds an executable in the PATH
- * @info: A pointer to a cmd_info struct
+ * @info: A pointer to a info_t struct
  */
-void find_executable(cmd_info **info)
+void find_executable(info_t **info)
 {
 	int i, path_len;
 	char *path = _getenv("PATH");
@@ -56,15 +56,16 @@ void find_executable(cmd_info **info)
 		return;
 
 	path_len = split_str(path, &path_buffer, ":", 0);
+	if (path_len == -1)
+		exit_shell(*info, EXIT_FAILURE);
 
 	for (i = 0; i < path_len; i++)
 	{
-		path_with_cmd = (char *)malloc(strlen(path_buffer[i])
-			+ strlen((*info)->argv[0]) + 2);
+		path_with_cmd = (char *)malloc(strlen(path_buffer[i]) + strlen((*info)->argv[0]) + 2);
 		if (path_with_cmd == NULL)
 		{
 			perror("Memory allocation error");
-			exit(EXIT_FAILURE);
+			exit_shell(*info, EXIT_FAILURE);
 		}
 
 		path_with_cmd = _strcpy(path_with_cmd, path_buffer[i]);
@@ -80,5 +81,5 @@ void find_executable(cmd_info **info)
 
 		free(path_with_cmd);
 	}
-	return;					/* Command not found in any PATH directory */
+	return; /* Command not found in any PATH directory */
 }

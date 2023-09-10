@@ -13,7 +13,7 @@ char *allocate_and_copy(const char *str, int length)
 	if (copy == NULL)
 	{
 		perror("Memory allocation failed");
-		exit(EXIT_FAILURE);
+		return (NULL);
 	}
 	_strncpy(copy, (char *)str, length);
 	copy[length] = '\0';
@@ -25,7 +25,7 @@ char *allocate_and_copy(const char *str, int length)
  * @delim: delimiter
  *
  * Return: number of words
-*/
+ */
 int count_words(const char *str, char *delim)
 {
 	int word_count = 0, k;
@@ -33,7 +33,7 @@ int count_words(const char *str, char *delim)
 	for (k = 0; str[k] != '\0'; k++)
 	{
 		if (!is_delim(str[k], delim) &&
-		(is_delim(str[k + 1], delim) || str[k + 1] == '\0'))
+			(is_delim(str[k + 1], delim) || str[k + 1] == '\0'))
 			word_count++;
 	}
 	return (word_count);
@@ -65,13 +65,13 @@ int is_delim(char c, char *delim)
  * @s: string to be converted
  *
  *Return: 0 if no numbers in string, converted number otherwise
-*/
+ */
 int _atoi(char *s)
 {
 	int i, sign = 1, flag = 0, output;
 	unsigned int result = 0;
 
-	for (i = 0;  s[i] != '\0' && flag != 2; i++)
+	for (i = 0; s[i] != '\0' && flag != 2; i++)
 	{
 		if (s[i] == '-')
 			sign *= -1;
@@ -92,4 +92,14 @@ int _atoi(char *s)
 		output = result;
 
 	return (output);
+}
+/**
+ * exit_shell - exits the shell
+ * @info: the parameter & return info struct
+ * @exit_status: the exit status
+ */
+void exit_shell(info_t *info, int exit_status)
+{
+	free(info);
+	exit(exit_status);
 }

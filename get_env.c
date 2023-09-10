@@ -7,19 +7,19 @@
  */
 char *_getenv(const char *name)
 {
-	int i;
-	char *var;
+	t_env *current = env_list;
 
 	if (name == NULL || name[0] == '\0' || _strchr((char *)name, '=') != NULL)
 		return (NULL);
-	/* Iterate through the environment variables */
-	for (i = 0; environ[i] != NULL; i++)
+
+	while (current != NULL)
 	{
-		var = environ[i];
-		if (strncmp(var, (char *)name, strlen((char *)name))
-			== 0 && var[strlen((char *)name)] == '=')
-			return (var + strlen((char *)name) + 1);
+		if (_strcmp(current->name, (char *)name) == 0)
+			return (current->value);
+
+		current = current->next;
 	}
+
 	return (NULL);
 }
 /**
@@ -32,45 +32,30 @@ char *_getenv(const char *name)
  */
 int _setenv(const char *name, const char *value, int overwrite)
 {
-	int i, j, count = 0;
-	size_t len;
-	char *new_var, **new_environ;
-
+	/* Input validation */
 	if (name == NULL || name[0] == '\0' || strchr((char *)name, '=') != NULL)
-		return (0);
-	for (i = 0; environ[i] != NULL; i++)
 	{
-		if (_strncmp(environ[i], (char *)name, _strlen((char *)name))
-			== 0 && environ[i][_strlen((char *)name)] == '=')
-		{
-			if (overwrite)
-			{
-				free(environ[i]);
-				break;
-			}
-			else
-				return (0);
-		}
-	}
-	len = _strlen((char *)name) + _strlen((char *)value) + 2;
-	new_var = malloc(len);
-	if (new_var == NULL)
-		return (0);
-	new_var = _strcpy(new_var, (char *)name);
-	new_var = _strcat(new_var, "=");
-	new_var = _strcat(new_var, (char *)value);
-	for (j = 0; environ[j] != NULL; j++)
-		;
-	new_environ = malloc(sizeof(char *) * (count + 2));
-	if (new_environ == NULL)
-	{
-		free(new_var);
+		/* Invalid name, return failure */
 		return (0);
 	}
-	environ = new_environ;
-	environ[count] = new_var;
-	environ[count + 1] = NULL;
-	return (1);
+
+	/* TODO: Implement the logic to set the environment variable */
+	if (overwrite)
+	{
+		if (edit_node(&env_list, (char *)name, (char *)value))
+			return (1);
+		else if (add_node_end(&env_list, (char *)name, (char *)value))
+			return (1);
+		else
+			return (0);
+	}
+	else
+	{
+		if (add_node_end(&env_list, (char *)name, (char *)value))
+			return (1);
+		else
+			return (0);
+	}
 }
 /**
  * _unsetenv - deletes an environment variable
@@ -80,28 +65,12 @@ int _setenv(const char *name, const char *value, int overwrite)
  */
 int _unsetenv(const char *name)
 {
-	int i, j;
-
 	if (name == NULL || name[0] == '\0' || _strchr((char *)name, '=') != NULL)
 		/* Invalid variable (char *)name */
 		return (0);
 
-	/* Find the variable to delete */
-	for (i = 0; environ[i] != NULL; i++)
-	{
-		if (_strncmp(environ[i], (char *)name, strlen((char *)name))
-			== 0 && environ[i][strlen((char *)name)] == '=')
-		{
-			/* Variable found, delete it */
-			free(environ[i]);
-
-			/* Shift the remaining variables to fill the gap */
-			for (j = i; environ[j] != NULL; j++)
-				environ[j] = environ[j + 1];
-
-			return (1); /* Variable deleted successfully */
-		}
-	}
-
-	return (1); /* Variable not found (no error) */
+	if (remove_node(&env_list, (char *)name))
+		return (1);
+	else
+		return (0);
 }

@@ -5,7 +5,7 @@
  *
  * Return: 1 if found, 0 if not
  */
-int which_builtin(cmd_info *info)
+int which_builtin(info_t *info)
 {
 	int i, j, k;
 	char *path;
@@ -50,7 +50,7 @@ int which_builtin(cmd_info *info)
  *
  * Return: 0 on success, 1 on failure
  */
-int exit_builtin(cmd_info *info)
+int exit_builtin(info_t *info)
 {
 	int exit_status;
 
@@ -63,12 +63,12 @@ int exit_builtin(cmd_info *info)
 	if (info->argc == 2)
 	{
 		exit_status = _atoi(info->argv[1]);
-		exit(exit_status);
+		exit_shell(info, exit_status);
 
 		return (EXIT_SUCCESS);
 	}
 
-	exit(EXIT_SUCCESS);
+	exit_shell(info, EXIT_SUCCESS);
 	return (EXIT_SUCCESS);
 }
 /**
@@ -77,7 +77,7 @@ int exit_builtin(cmd_info *info)
  *
  * Return: 0 on success, 1 on failure
  */
-int env_builtin(cmd_info *info)
+int env_builtin(info_t *info)
 {
 	int i;
 	(void)info;
@@ -99,7 +99,7 @@ int env_builtin(cmd_info *info)
  *
  * Return: 0 on success, 1 on failure
  */
-int setenv_builtin(cmd_info *info)
+int setenv_builtin(info_t *info)
 {
 	if (info->argc != 3)
 	{
@@ -121,7 +121,7 @@ int setenv_builtin(cmd_info *info)
  *
  * Return: 0 on success, 1 on failure
  */
-int unsetenv_builtin(cmd_info *info)
+int unsetenv_builtin(info_t *info)
 {
 	if (info->argc != 2)
 	{
