@@ -16,6 +16,8 @@ int find_builtin(cmd_info **info)
 		{"which", which_builtin},
 		{"exit", exit_builtin},
 		{"env", env_builtin},
+		{"setenv", setenv_builtin},
+		{"unsetenv", unsetenv_builtin},
 		{NULL, NULL}
 	};
 	/* find built-in command */

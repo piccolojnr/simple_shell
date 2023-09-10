@@ -93,3 +93,46 @@ int env_builtin(cmd_info *info)
 
 	return (0);
 }
+/**
+ * setenv_builtin - sets an environment variable
+ * @info: the parameter struct
+ *
+ * Return: 0 on success, 1 on failure
+ */
+int setenv_builtin(cmd_info *info)
+{
+	if (info->argc != 3)
+	{
+		printf("Usage: setenv varname varvalue\n");
+		return (EXIT_FAILURE);
+	}
+
+	if (!_setenv(info->argv[1], info->argv[2], 1))
+	{
+		printf("Error: setenv failed\n");
+		return (EXIT_FAILURE);
+	}
+
+	return (EXIT_SUCCESS);
+}
+/**
+ * unsetenv_builtin - deletes an environment variable
+ * @info: the parameter struct
+ *
+ * Return: 0 on success, 1 on failure
+ */
+int unsetenv_builtin(cmd_info *info)
+{
+	if (info->argc != 2)
+	{
+		printf("Usage: unsetenv varname\n");
+		return (EXIT_FAILURE);
+	}
+
+	if (!_unsetenv(info->argv[1]))
+	{
+		printf("Error: unsetenv failed\n");
+		return (EXIT_FAILURE);
+	}
+	return (EXIT_SUCCESS);
+}

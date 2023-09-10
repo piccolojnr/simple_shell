@@ -28,7 +28,7 @@ char *_getenv(const char *name)
  * @value: value of the environment variable
  * @overwrite: overwrite the variable or not
  *
- * Return: 0 on success, -1 on failure
+ * Return: 1 on success, 0 on failure
  */
 int _setenv(const char *name, const char *value, int overwrite)
 {
@@ -37,7 +37,7 @@ int _setenv(const char *name, const char *value, int overwrite)
 	char *new_var, **new_environ;
 
 	if (name == NULL || name[0] == '\0' || strchr((char *)name, '=') != NULL)
-		return (-1);
+		return (0);
 	for (i = 0; environ[i] != NULL; i++)
 	{
 		if (_strncmp(environ[i], (char *)name, _strlen((char *)name))
@@ -55,7 +55,7 @@ int _setenv(const char *name, const char *value, int overwrite)
 	len = _strlen((char *)name) + _strlen((char *)value) + 2;
 	new_var = malloc(len);
 	if (new_var == NULL)
-		return (-1);
+		return (0);
 	new_var = _strcpy(new_var, (char *)name);
 	new_var = _strcat(new_var, "=");
 	new_var = _strcat(new_var, (char *)value);
@@ -65,18 +65,18 @@ int _setenv(const char *name, const char *value, int overwrite)
 	if (new_environ == NULL)
 	{
 		free(new_var);
-		return (-1);
+		return (0);
 	}
 	environ = new_environ;
 	environ[count] = new_var;
 	environ[count + 1] = NULL;
-	return (0);
+	return (1);
 }
 /**
  * _unsetenv - deletes an environment variable
  * @name: name of the environment variable
  *
- * Return: 0 on success, -1 on failure
+ * Return: 1 on success, 0 on failure
  */
 int _unsetenv(const char *name)
 {
@@ -84,7 +84,7 @@ int _unsetenv(const char *name)
 
 	if (name == NULL || name[0] == '\0' || _strchr((char *)name, '=') != NULL)
 		/* Invalid variable (char *)name */
-		return (-1);
+		return (0);
 
 	/* Find the variable to delete */
 	for (i = 0; environ[i] != NULL; i++)
@@ -99,9 +99,9 @@ int _unsetenv(const char *name)
 			for (j = i; environ[j] != NULL; j++)
 				environ[j] = environ[j + 1];
 
-			return (0); /* Variable deleted successfully */
+			return (1); /* Variable deleted successfully */
 		}
 	}
 
-	return (0); /* Variable not found (no error) */
+	return (1); /* Variable not found (no error) */
 }

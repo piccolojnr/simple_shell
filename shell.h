@@ -2,7 +2,7 @@
 #define SHELL_H
 
 #define MAX_PATH_LENGTH 1024
-
+#define BUFFER_SIZE 128
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,7 +35,6 @@ typedef struct command_info
 	int is_built_in;
 } cmd_info;
 
-
 /**
  * struct tbt - builtin table
  * @type: type of builtin
@@ -53,6 +52,11 @@ extern char **environ;
 /* run_shell */
 void run_shell(void);
 void find_executable(cmd_info **info);
+
+/* _getline */
+ssize_t _getline(char **lineptr, size_t *n, FILE *stream);
+void get_input(cmd_info *info);
+void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size);
 
 /* executable_cmd */
 void execute_command(cmd_info *);
@@ -76,11 +80,12 @@ char *_strcat(char *, const char *);
 /* builtin */
 int find_builtin(cmd_info **);
 
-
 /* built_in */
 int which_builtin(cmd_info *);
 int exit_builtin(cmd_info *);
 int env_builtin(cmd_info *info);
+int setenv_builtin(cmd_info *info);
+int unsetenv_builtin(cmd_info *info);
 
 /* get_env */
 char *_getenv(const char *name);

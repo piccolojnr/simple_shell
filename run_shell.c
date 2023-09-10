@@ -1,7 +1,7 @@
 #include "shell.h"
 /**
  * run_shell - Runs the shell
-*/
+ */
 void run_shell(void)
 {
 	int shell_status = 1;
@@ -10,13 +10,8 @@ void run_shell(void)
 	while (shell_status)
 	{
 		printf("piccolojnr$ ");
-		info->char_len = getline(&info->line, &info->line_len, stdin);
-		if ((info->char_len == -1) && (feof(stdin)))
-		{
-			perror("Error reading input");
-			free(info->line);
-			exit(EXIT_FAILURE);
-		}
+
+		get_input(info);
 
 		/* Remove newline */
 		info->line[info->char_len - 1] = '\0';
@@ -33,7 +28,8 @@ void run_shell(void)
 		{
 			execute_command(info);
 			free(info->path);
-		} else
+		}
+		else
 			printf("%s: command not found\n", info->argv[0]);
 	}
 
@@ -64,7 +60,7 @@ void find_executable(cmd_info **info)
 	for (i = 0; i < path_len; i++)
 	{
 		path_with_cmd = (char *)malloc(strlen(path_buffer[i])
-								+ strlen((*info)->argv[0]) + 2);
+			+ strlen((*info)->argv[0]) + 2);
 		if (path_with_cmd == NULL)
 		{
 			perror("Memory allocation error");
@@ -84,6 +80,5 @@ void find_executable(cmd_info **info)
 
 		free(path_with_cmd);
 	}
-	free_args(path_buffer); /* Clean up the path_buffer */
-	return;        /* Command not found in any PATH directory */
+	return;					/* Command not found in any PATH directory */
 }
