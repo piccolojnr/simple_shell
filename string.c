@@ -1,57 +1,55 @@
 #include "shell.h"
 /**
- *  split_str - splits a string and returns an array
- * of each word of the string
- * @str: string to be split
- * @args: array of words
- * @delim: delimiter
- * @word_count: number of words
+ * split_str - Splits a string into an array of words.
+ * @str: The string to be split.
+ * @args: A pointer to the array of words.
+ * @delim: The delimiter used for splitting.
  *
- * Return: word_count
+ * Return: The number of words in the array or -1 on failure.
  */
-int split_str(char *str, char ***args, char *delim,
-			  int word_count)
+int split_str(char *str, char ***args, char *delim)
 {
-	int i, count, word_index, remaining_length;
+	int word_count = 0;
+	char *token, **temp, *str_copy = NULL;
 
-	if (!str)
-		return (0);
-	if (word_count == 0)
-		word_count = count_words(str, delim);
-	if (word_count == 0)
-		return (0);
-	*args = malloc(sizeof(char *) * (word_count + 1));
-	if (*args == NULL)
+	if (!str || !args || !delim)
+		return -1;
+
+	*args = NULL;
+	str_copy = _strdup(str); /* Make a copy to avoid modifying the original string */
+	if (!str_copy)
 	{
 		perror("Memory allocation failed");
-		return (0);
+		return -1;
 	}
-	word_index = 0;
-	for (i = 0; str[i] != '\0'; i++)
+
+	token = strtok(str_copy, delim);
+	while (token)
 	{
-		while (is_delim(str[i], delim))
-			i++;
-		count = 0;
-		while ((!is_delim(str[i + count], delim) || word_index == word_count) &&
-			   str[i + count] != '\0')
-			count++;
-		(*args)[word_index] = allocate_and_copy(str + i, count);
-		if ((*args)[word_index] == NULL)
-			return (-1);
-		word_index++;
-		i += count;
-		if (word_index == word_count - 1)
+		word_count++;
+		temp = _realloc(temp, sizeof(char *) * (word_count - 1), sizeof(char *) * (word_count + 1));
+		if (!temp)
 		{
-			remaining_length = strlen(str + i);
-			(*args)[word_index] = allocate_and_copy(str + i + 1, remaining_length);
-			if ((*args)[word_index] == NULL)
-				return (-1);
-			break;
+			perror("Memory allocation failed");
+			free(str_copy);
+			return -1;
 		}
+		*args = temp;
+		(*args)[word_count - 1] = _strdup(token);
+		if (!(*args)[word_count - 1])
+		{
+			perror("Memory allocation failed");
+			free(str_copy);
+			return -1;
+		}
+		(*args)[word_count] = NULL;
+		token = strtok(NULL, delim);
 	}
-	(*args)[word_count] = NULL;
-	return (word_count);
+
+	free(str_copy);
+	return word_count;
 }
+
 /**
  * free_args - frees an array of arguments
  * @args: array of arguments

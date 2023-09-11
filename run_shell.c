@@ -17,10 +17,12 @@ void run_shell(void)
 		info->line[info->char_len - 1] = '\0';
 
 		/* Split the input line into arguments */
-		info->argc = split_str(info->line, &info->argv, " \n\t\r\v\f", 0);
+		info->argc = split_str(info->line, &info->argv, " \n\t\r\v\f");
 
 		if (info->argv == NULL || info->argc == 0)
 			continue; /* Ignore empty lines or input errors */
+
+		replace_env_var(&info);
 
 		/* Check if the command exists in the PATH and execute it */
 		find_executable(&info);
@@ -28,6 +30,10 @@ void run_shell(void)
 		{
 			execute_command(info);
 			free(info->path);
+		}
+		else if (info->is_built_in == -1)
+		{
+			continue;
 		}
 		else
 			printf("%s: command not found\n", info->argv[0]);
@@ -55,7 +61,7 @@ void find_executable(info_t **info)
 	if (path == NULL || (*info)->argv[0] == NULL)
 		return;
 
-	path_len = split_str(path, &path_buffer, ":", 0);
+	path_len = split_str(path, &path_buffer, ":");
 	if (path_len == -1)
 		exit_shell(*info, EXIT_FAILURE);
 

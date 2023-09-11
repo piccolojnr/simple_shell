@@ -14,7 +14,7 @@ int main(int argc, char **argv)
 	(void)argc;
 	(void)argv;
 
-	create_env_list();
+	env_list = create_env_list();
 
 	run_shell();
 	return (EXIT_SUCCESS);

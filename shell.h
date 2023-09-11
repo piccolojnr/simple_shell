@@ -76,7 +76,7 @@ void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size);
 void execute_command(info_t *);
 
 /* string */
-int split_str(char *, char ***, char *, int);
+int split_str(char *str, char ***args, char *delim);
 void free_args(char **);
 
 /* string 2*/
@@ -113,6 +113,9 @@ int count_words(const char *str, char *delim);
 int is_delim(char, char *);
 int _atoi(char *s);
 void exit_shell(info_t *info, int exit_status);
+
+/** helper 1*/
+char **split_env(char *str);
 
 /* lists */
 t_env *create_env_list();

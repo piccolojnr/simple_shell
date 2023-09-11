@@ -19,9 +19,6 @@ int find_builtin(info_t **info)
 		{"unsetenv", unsetenv_builtin},
 		{NULL, NULL}};
 
-	/* find and replace env var */
-	replace_env_var(info);
-
 	/* find built-in command */
 	for (i = 0; builtintbl[i].type; i++)
 	{
@@ -36,28 +33,35 @@ int find_builtin(info_t **info)
 }
 
 /**
- * replace_env_var - finds and replaces environment variables
- * with their values
- * @info: ..
+ * replace_env_var - Replaces environment variable references in argv
+ * @info: Pointer to the info_t structure
  */
 void replace_env_var(info_t **info)
 {
 	int i;
-	char *env;
+	char *env_name, *env_value;
 
 	for (i = 0; i < (*info)->argc; i++)
 	{
-		if ((*info)->argv[i][0] == '$' &&
-			(*info)->argv[i][1] != '\0' && (*info)->argv[i][1] != '\n')
+		if ((*info)->argv[i][0] == '$' && (*info)->argv[i][1] != '\0' && (*info)->argv[i][1] != '\n')
 		{
-			env = _getenv((*info)->argv[i] + 1);
-			free((*info)->argv[i]);
-			if (env)
+			env_name = (*info)->argv[i] + 1; /* Skip the '$' symbol */
+			env_value = _getenv(env_name);
+
+			if (env_value)
 			{
-				(*info)->argv[i] = env;
+				free((*info)->argv[i]);				   /* Free the original argument */
+				(*info)->argv[i] = _strdup(env_value); /* Replace with the environment variable value */
+				if (!(*info)->argv[i])
+				{
+					perror("strdup");
+					exit(EXIT_FAILURE); /* Handle memory allocation failure */
+				}
 			}
 			else
 			{
+				/* Environment variable not found, set the argument to NULL */
+				free((*info)->argv[i]);
 				(*info)->argv[i] = NULL;
 			}
 		}

@@ -6,14 +6,14 @@
  */
 t_env *create_env_list()
 {
-	int i, len;
+	int i;
 	t_env *head = NULL;
 	char *name, *value, **args;
 
 	for (i = 0; environ[i]; i++)
 	{
-		len = split_str(environ[i], &args, "=", 2);
-		if (!args || len < 2)
+		args = split_env(environ[i]);
+		if (!args)
 			continue;
 
 		name = args[0];
@@ -38,7 +38,7 @@ t_env *add_node_end(t_env **head, const char *name, const char *value)
 	if (new == NULL)
 		return (NULL);
 
-	new->name = strdup(name);
+	new->name = _strdup(name);
 	if (new->name == NULL)
 	{
 		free(new);

@@ -26,7 +26,7 @@ int which_builtin(info_t *info)
 		return (EXIT_FAILURE);
 	}
 
-	j = split_str(path, &paths, ":", 0);
+	j = split_str(path, &paths, ":");
 
 	for (i = 0; i < j; i++)
 	{
@@ -79,16 +79,17 @@ int exit_builtin(info_t *info)
  */
 int env_builtin(info_t *info)
 {
-	int i;
+	t_env *current = env_list;
+
 	(void)info;
 
-	if (environ == NULL)
-	{
+	if (env_list == NULL)
 		return (1);
-	}
-	for (i = 0; environ[i] != NULL; i++)
+
+	while (current)
 	{
-		printf("%s\n", environ[i]);
+		printf("%s=%s\n", current->name, current->value);
+		current = current->next;
 	}
 
 	return (0);
