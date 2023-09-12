@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <stdarg.h>
 
 /**
  * struct env_list - linked list of environment variables
@@ -128,5 +129,10 @@ int remove_node(char *, t_env **);
 
 /* _strtok */
 char *_strtok(char *str, const char *delim);
+
+/* _puts */
+int _putchar(char);
+void _puts(char *);
+int _printf(const char *format, ...);
 
 #endif /* SHELL_H */

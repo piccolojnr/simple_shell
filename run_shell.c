@@ -9,7 +9,7 @@ void run_shell(t_env **env_list)
 
 	while (shell_status)
 	{
-		printf("piccolojnr$ ");
+		_printf("piccolojnr$ ");
 
 		get_input(info);
 
@@ -38,7 +38,7 @@ void run_shell(t_env **env_list)
 			continue;
 		}
 		else
-			printf("%s: command not found tt\n", info->argv[0]);
+			_printf("%s: command not found tt\n", info->argv[0]);
 	}
 
 	exit_shell(info, EXIT_SUCCESS);

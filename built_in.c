@@ -11,18 +11,18 @@ int which_builtin(info_t *info, t_env **env_list)
 	char *path;
 	char **paths = NULL;
 	struct stat file_stat;
-	char filepath[1024]; /* Adjust the buffer size as needed */
+	char *filepath; /* Adjust the buffer size as needed */
 
 	if (info->argc < 2)
 	{
-		fprintf(stderr, "Usage: %s filename ...\n", info->argv[0]);
+		_printf("Usage: %s filename ...\n", info->argv[0]);
 		return (EXIT_FAILURE);
 	}
 
 	path = _getenv("PATH", *env_list);
 	if (path == NULL)
 	{
-		fprintf(stderr, "PATH environment variable not found.\n");
+		_printf("PATH environment variable not found.\n");
 		return (EXIT_FAILURE);
 	}
 
@@ -32,12 +32,12 @@ int which_builtin(info_t *info, t_env **env_list)
 	{
 		for (k = 1; k < info->argc; k++)
 		{
-			snprintf(filepath, sizeof(filepath), "%s/%s", paths[i], info->argv[k]);
+			filepath = concat_path_and_cmd(paths[i], info->argv[k]);
 
 			if (stat(filepath, &file_stat) == 0)
 			{
 				if (S_ISREG(file_stat.st_mode))
-					printf("%s\n", filepath);
+					_printf("%s\n", filepath);
 			}
 		}
 	}
@@ -58,7 +58,7 @@ int exit_builtin(info_t *info, t_env **env_list)
 
 	if (info->argc > 2)
 	{
-		printf("exit: too many arguments.\n");
+		_printf("exit: too many arguments.\n");
 		return (-2);
 	}
 
@@ -90,7 +90,7 @@ int env_builtin(info_t *info, t_env **env_list)
 
 	while (current)
 	{
-		printf("%s=%s\n", current->name, current->value);
+		_printf("%s=%s\n", current->name, current->value);
 		current = current->next;
 	}
 
@@ -106,13 +106,13 @@ int setenv_builtin(info_t *info, t_env **env_list)
 {
 	if (info->argc != 3)
 	{
-		printf("Usage: setenv varname varvalue\n");
+		_printf("Usage: setenv varname varvalue\n");
 		return (EXIT_FAILURE);
 	}
 
 	if (!_setenv(info->argv[1], info->argv[2], 1, env_list))
 	{
-		printf("Error: setenv failed\n");
+		_printf("Error: setenv failed\n");
 		return (EXIT_FAILURE);
 	}
 
@@ -128,13 +128,13 @@ int unsetenv_builtin(info_t *info, t_env **env_list)
 {
 	if (info->argc != 2)
 	{
-		printf("Usage: unsetenv varname\n");
+		_printf("Usage: unsetenv varname\n");
 		return (EXIT_FAILURE);
 	}
 
 	if (!_unsetenv(info->argv[1], env_list))
 	{
-		printf("Error: unsetenv failed\n");
+		_printf("Error: unsetenv failed\n");
 		return (EXIT_FAILURE);
 	}
 	return (EXIT_SUCCESS);
