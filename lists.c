@@ -1,14 +1,22 @@
 #include "shell.h"
-/*
+/**
  * create_env_list - creates a linked list of environment variables
  *
- * Return: head of the linked list
+ * Return: 1 on success, 0 on failure
  */
-t_env *create_env_list()
+int create_env_list(void)
 {
 	int i;
 	t_env *head = NULL;
 	char *name, *value, **args;
+
+	if (environ == NULL)
+		return (0);
+
+	if (env_list != NULL)
+	{
+		free_env_list(env_list);
+	}
 
 	for (i = 0; environ[i]; i++)
 	{
@@ -19,69 +27,69 @@ t_env *create_env_list()
 		name = args[0];
 		value = args[1];
 
-		add_node_end(&head, name, value);
+		if (!add_node_end(name, value))
+		{
+			free_env_list(head);
+			return (0);
+		}
 	}
 
-	return (head);
+	return (1);
 }
 /**
  * add_node_end - adds a new node at the beginning
- * @head: head of the linked list
- * @str: string to store in the list
+ * @name: name of the node
+ * @value: value of the node
  *
- * Return: address of the head
+ * Return: 1 on success, 0 on failure
  */
-t_env *add_node_end(t_env **head, const char *name, const char *value)
+int add_node_end(const char *name, const char *value)
 {
 	t_env *new = (t_env *)malloc(sizeof(t_env));
 
 	if (new == NULL)
-		return (NULL);
+		return (0);
 
 	new->name = _strdup(name);
 	if (new->name == NULL)
 	{
+		perror("add node 1");
 		free(new);
-		return (NULL);
+		return (0);
 	}
 	new->value = _strdup(value);
-	if (new->value == NULL)
-	{
-		free(new);
-		return (NULL);
-	}
 
-	new->next = *head;
-	*head = new;
+	new->next = env_list;
+	env_list = new;
 
-	return (new);
+	return (1);
 }
 /**
  * remove_node - Removes a node with a specified name from a linked list
- * @head: pointer to the head of the linked list
  * @name: name of the node to remove
  *
  * Return: 1 on success, 0 on failure
  */
-int remove_node(t_env **head, char *name)
+int remove_node(char *name)
 {
-	t_env *current = *head;
+	t_env *current = env_list;
 	t_env *prev = NULL;
 
-	if (*head == NULL)
+	if (env_list == NULL)
 		return (0);
 
 	while (current != NULL)
 	{
-		if (_strcmp(current->name, name) == 0)
+		if (_strcmp(current->name, (char *)name) == 0)
 		{
 			if (prev == NULL)
-				*head = current->next;
+				env_list = current->next;
 			else
 				prev->next = current->next;
 			free(current->name);
 			free(current->value);
 			free(current);
+			return (1);
 		}
 		prev = current;
 		current = current->next;
@@ -91,17 +99,16 @@ int remove_node(t_env **head, char *name)
 }
 /**
  * edit_node - Finds and edits a node in a linked list
- * @head: Pointer to the head of the linked list
  * @name: Name of the node to edit
  * @new_value: New value to set for the node
  *
- * Return: 1 on success, 0 on failure (node not found or memory allocation error)
+ * Return: 1 on success, 0 on failure
  */
-int edit_node(t_env **head, char *name, char *new_value)
+int edit_node(char *name, char *new_value)
 {
-	t_env *current = *head;
+	t_env *current = env_list;
 
-	if (*head == NULL)
+	if (env_list == NULL)
 		return (0);
 
 	while (current != NULL)

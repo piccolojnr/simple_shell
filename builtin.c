@@ -43,15 +43,16 @@ void replace_env_var(info_t **info)
 
 	for (i = 0; i < (*info)->argc; i++)
 	{
-		if ((*info)->argv[i][0] == '$' && (*info)->argv[i][1] != '\0' && (*info)->argv[i][1] != '\n')
+		if ((*info)->argv[i][0] == '$' && (*info)->argv[i][1]
+			!= '\0' && (*info)->argv[i][1] != '\n')
 		{
 			env_name = (*info)->argv[i] + 1; /* Skip the '$' symbol */
 			env_value = _getenv(env_name);
 
 			if (env_value)
 			{
-				free((*info)->argv[i]);				   /* Free the original argument */
-				(*info)->argv[i] = _strdup(env_value); /* Replace with the environment variable value */
+				free((*info)->argv[i]);	
+				(*info)->argv[i] = _strdup(env_value);
 				if (!(*info)->argv[i])
 				{
 					perror("strdup");

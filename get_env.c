@@ -42,16 +42,16 @@ int _setenv(const char *name, const char *value, int overwrite)
 	/* TODO: Implement the logic to set the environment variable */
 	if (overwrite)
 	{
-		if (edit_node(&env_list, (char *)name, (char *)value))
+		if (edit_node((char *)name, (char *)value))
 			return (1);
-		else if (add_node_end(&env_list, (char *)name, (char *)value))
+		else if (add_node_end((char *)name, (char *)value))
 			return (1);
 		else
 			return (0);
 	}
 	else
 	{
-		if (add_node_end(&env_list, (char *)name, (char *)value))
+		if (add_node_end((char *)name, (char *)value))
 			return (1);
 		else
 			return (0);
@@ -66,10 +66,9 @@ int _setenv(const char *name, const char *value, int overwrite)
 int _unsetenv(const char *name)
 {
 	if (name == NULL || name[0] == '\0' || _strchr((char *)name, '=') != NULL)
-		/* Invalid variable (char *)name */
 		return (0);
 
-	if (remove_node(&env_list, (char *)name))
+	if (remove_node((char *)name))
 		return (1);
 	else
 		return (0);

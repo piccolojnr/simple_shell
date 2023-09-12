@@ -13,26 +13,27 @@ int split_str(char *str, char ***args, char *delim)
 	char *token, **temp, *str_copy = NULL;
 
 	if (!str || !args || !delim)
-		return -1;
+		return (-1);
 
 	*args = NULL;
-	str_copy = _strdup(str); /* Make a copy to avoid modifying the original string */
+	str_copy = _strdup(str);
 	if (!str_copy)
 	{
 		perror("Memory allocation failed");
-		return -1;
+		return (-1);
 	}
 
 	token = strtok(str_copy, delim);
 	while (token)
 	{
 		word_count++;
-		temp = _realloc(temp, sizeof(char *) * (word_count - 1), sizeof(char *) * (word_count + 1));
+		temp = _realloc(temp, sizeof(char *) *
+			(word_count - 1), sizeof(char *) * (word_count + 1));
 		if (!temp)
 		{
 			perror("Memory allocation failed");
 			free(str_copy);
-			return -1;
+			return (-1);
 		}
 		*args = temp;
 		(*args)[word_count - 1] = _strdup(token);
@@ -40,14 +41,13 @@ int split_str(char *str, char ***args, char *delim)
 		{
 			perror("Memory allocation failed");
 			free(str_copy);
-			return -1;
+			return (-1);
 		}
 		(*args)[word_count] = NULL;
 		token = strtok(NULL, delim);
 	}
-
 	free(str_copy);
-	return word_count;
+	return (word_count);
 }
 
 /**

@@ -63,6 +63,8 @@ typedef struct tbt
 extern char **environ;
 extern t_env *env_list;
 
+t_env *env_list = NULL;
+
 /* run_shell */
 void run_shell(void);
 void find_executable(info_t **info);
@@ -116,12 +118,13 @@ void exit_shell(info_t *info, int exit_status);
 
 /** helper 1*/
 char **split_env(char *str);
+char *concat_path_and_cmd(const char *path, const char *cmd);
 
 /* lists */
-t_env *create_env_list();
-t_env *add_node_end(t_env **head, const char *name, const char *value);
+int create_env_list();
+int add_node_end(const char *name, const char *value);
 void free_env_list(t_env *head);
-int edit_node(t_env **head, char *name, char *new_value);
-int remove_node(t_env **head, char *name);
+int edit_node(char *name, char *new_value);
+int remove_node(char *name);
 
 #endif /* SHELL_H */

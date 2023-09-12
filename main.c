@@ -1,7 +1,5 @@
 #include "shell.h"
 
-t_env *env_list = NULL;
-
 /**
  * main - entry point
  * @argc: argument count
@@ -14,7 +12,11 @@ int main(int argc, char **argv)
 	(void)argc;
 	(void)argv;
 
-	env_list = create_env_list();
+	if (!create_env_list())
+	{
+		perror("main");
+		exit(EXIT_FAILURE);
+	}
 
 	run_shell();
 	return (EXIT_SUCCESS);
