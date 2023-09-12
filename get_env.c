@@ -2,10 +2,11 @@
 /**
  * _getenv - gets the environment variable
  * @name: name of the environment variable
+ * @env_list: ...
  *
  * Return: value of the environment variable
  */
-char *_getenv(const char *name)
+char *_getenv(const char *name, t_env *env_list)
 {
 	t_env *current = env_list;
 
@@ -15,7 +16,9 @@ char *_getenv(const char *name)
 	while (current != NULL)
 	{
 		if (_strcmp(current->name, (char *)name) == 0)
+		{
 			return (current->value);
+		}
 
 		current = current->next;
 	}
@@ -30,7 +33,7 @@ char *_getenv(const char *name)
  *
  * Return: 1 on success, 0 on failure
  */
-int _setenv(const char *name, const char *value, int overwrite)
+int _setenv(const char *name, const char *value, int overwrite, t_env **env_list)
 {
 	/* Input validation */
 	if (name == NULL || name[0] == '\0' || strchr((char *)name, '=') != NULL)
@@ -42,16 +45,16 @@ int _setenv(const char *name, const char *value, int overwrite)
 	/* TODO: Implement the logic to set the environment variable */
 	if (overwrite)
 	{
-		if (edit_node((char *)name, (char *)value))
+		if (edit_node((char *)name, (char *)value, env_list))
 			return (1);
-		else if (add_node_end((char *)name, (char *)value))
+		else if (add_node_end((char *)name, (char *)value, env_list))
 			return (1);
 		else
 			return (0);
 	}
 	else
 	{
-		if (add_node_end((char *)name, (char *)value))
+		if (add_node_end((char *)name, (char *)value, env_list))
 			return (1);
 		else
 			return (0);
@@ -63,12 +66,12 @@ int _setenv(const char *name, const char *value, int overwrite)
  *
  * Return: 1 on success, 0 on failure
  */
-int _unsetenv(const char *name)
+int _unsetenv(const char *name, t_env **env_list)
 {
 	if (name == NULL || name[0] == '\0' || _strchr((char *)name, '=') != NULL)
 		return (0);
 
-	if (remove_node((char *)name))
+	if (remove_node((char *)name, env_list))
 		return (1);
 	else
 		return (0);

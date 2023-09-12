@@ -55,6 +55,7 @@ ssize_t _getline(char **lineptr, size_t *n, FILE *stream)
 void get_input(info_t *info)
 {
     info->char_len = getline(&info->line, &info->line_len, stdin);
+
     if ((info->char_len == -1))
     {
         if (feof(stdin))
@@ -79,7 +80,7 @@ void get_input(info_t *info)
  * @ptr: pointer to the buffer
  * @new_size: new size of the buffer
  * @old_size: old size of the buffer
- * 
+ *
  * Return: pointer to the buffer
  */
 void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size)

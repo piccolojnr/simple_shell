@@ -2,7 +2,7 @@
 /**
  * run_shell - Runs the shell
  */
-void run_shell(void)
+void run_shell(t_env **env_list)
 {
 	int shell_status = 1;
 	info_t *info = malloc(sizeof(info_t));
@@ -22,10 +22,12 @@ void run_shell(void)
 		if (info->argv == NULL || info->argc == 0)
 			continue; /* Ignore empty lines or input errors */
 
-		replace_env_var(&info);
+		replace_env_var(&info, *env_list);
+		if (info->argc == 0)
+			continue;
 
 		/* Check if the command exists in the PATH and execute it */
-		find_executable(&info);
+		find_executable(&info, env_list);
 		if (info->path != NULL && info->is_built_in == -1)
 		{
 			execute_command(info);
@@ -46,18 +48,18 @@ void run_shell(void)
  * find_executable - Finds an executable in the PATH
  * @info: A pointer to a info_t struct
  */
-void find_executable(info_t **info)
+void find_executable(info_t **info, t_env **env_list)
 {
 	int i, path_len;
-	char *path = _getenv("PATH");
+	char *path;
 	char **path_buffer;
 	char *path_with_cmd;
 
 	/* check for built ins */
-	(*info)->is_built_in = find_builtin(info);
+	(*info)->is_built_in = find_builtin(*info, env_list);
 	if ((*info)->is_built_in != -1)
 		return;
-
+	path = _getenv("PATH", *env_list);
 	if (path == NULL || (*info)->argv[0] == NULL)
 		return;
 
@@ -67,8 +69,7 @@ void find_executable(info_t **info)
 
 	for (i = 0; i < path_len; i++)
 	{
-		path_with_cmd = (char *)malloc(strlen(path_buffer[i])
-			+ strlen((*info)->argv[0]) + 2);
+		path_with_cmd = (char *)malloc(strlen(path_buffer[i]) + strlen((*info)->argv[0]) + 2);
 		if (path_with_cmd == NULL)
 		{
 			perror("Memory allocation error");

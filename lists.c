@@ -4,7 +4,7 @@
  *
  * Return: 1 on success, 0 on failure
  */
-int create_env_list(void)
+int create_env_list(t_env **env_list)
 {
 	int i;
 	t_env *head = NULL;
@@ -15,7 +15,7 @@ int create_env_list(void)
 
 	if (env_list != NULL)
 	{
-		free_env_list(env_list);
+		free_env_list(*env_list);
 	}
 
 	for (i = 0; environ[i]; i++)
@@ -27,7 +27,7 @@ int create_env_list(void)
 		name = args[0];
 		value = args[1];
 
-		if (!add_node_end(name, value))
+		if (!add_node_end(name, value, env_list))
 		{
 			free_env_list(head);
 			return (0);
@@ -43,7 +43,7 @@ int create_env_list(void)
  *
  * Return: 1 on success, 0 on failure
  */
-int add_node_end(const char *name, const char *value)
+int add_node_end(const char *name, const char *value, t_env **env_list)
 {
 	t_env *new = (t_env *)malloc(sizeof(t_env));
 
@@ -59,8 +59,8 @@ int add_node_end(const char *name, const char *value)
 	}
 	new->value = _strdup(value);
 
-	new->next = env_list;
-	env_list = new;
+	new->next = *env_list;
+	*env_list = new;
 
 	return (1);
 }
@@ -70,9 +70,9 @@ int add_node_end(const char *name, const char *value)
  *
  * Return: 1 on success, 0 on failure
  */
-int remove_node(char *name)
+int remove_node(char *name, t_env **env_list)
 {
-	t_env *current = env_list;
+	t_env *current = *env_list;
 	t_env *prev = NULL;
 
 	if (env_list == NULL)
@@ -83,7 +83,7 @@ int remove_node(char *name)
 		if (_strcmp(current->name, (char *)name) == 0)
 		{
 			if (prev == NULL)
-				env_list = current->next;
+				*env_list = current->next;
 			else
 				prev->next = current->next;
 			free(current->name);
@@ -104,9 +104,9 @@ int remove_node(char *name)
  *
  * Return: 1 on success, 0 on failure
  */
-int edit_node(char *name, char *new_value)
+int edit_node(char *name, char *new_value, t_env **env_list)
 {
-	t_env *current = env_list;
+	t_env *current = *env_list;
 
 	if (env_list == NULL)
 		return (0);

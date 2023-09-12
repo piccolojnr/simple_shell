@@ -23,7 +23,7 @@ int split_str(char *str, char ***args, char *delim)
 		return (-1);
 	}
 
-	token = strtok(str_copy, delim);
+	token = _strtok(str_copy, delim);
 	while (token)
 	{
 		word_count++;
@@ -44,7 +44,7 @@ int split_str(char *str, char ***args, char *delim)
 			return (-1);
 		}
 		(*args)[word_count] = NULL;
-		token = strtok(NULL, delim);
+		token = _strtok(NULL, delim);
 	}
 	free(str_copy);
 	return (word_count);

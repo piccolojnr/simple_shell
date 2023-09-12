@@ -5,7 +5,7 @@
  *
  * Return: 1 if found, 0 if not
  */
-int which_builtin(info_t *info)
+int which_builtin(info_t *info, t_env **env_list)
 {
 	int i, j, k;
 	char *path;
@@ -19,7 +19,7 @@ int which_builtin(info_t *info)
 		return (EXIT_FAILURE);
 	}
 
-	path = getenv("PATH");
+	path = _getenv("PATH", *env_list);
 	if (path == NULL)
 	{
 		fprintf(stderr, "PATH environment variable not found.\n");
@@ -50,9 +50,11 @@ int which_builtin(info_t *info)
  *
  * Return: 0 on success, 1 on failure
  */
-int exit_builtin(info_t *info)
+int exit_builtin(info_t *info, t_env **env_list)
 {
 	int exit_status;
+
+	(void)env_list;
 
 	if (info->argc > 2)
 	{
@@ -77,13 +79,13 @@ int exit_builtin(info_t *info)
  *
  * Return: 0 on success, 1 on failure
  */
-int env_builtin(info_t *info)
+int env_builtin(info_t *info, t_env **env_list)
 {
-	t_env *current = env_list;
+	t_env *current = *env_list;
 
 	(void)info;
 
-	if (env_list == NULL)
+	if (*env_list == NULL)
 		return (1);
 
 	while (current)
@@ -100,7 +102,7 @@ int env_builtin(info_t *info)
  *
  * Return: 0 on success, 1 on failure
  */
-int setenv_builtin(info_t *info)
+int setenv_builtin(info_t *info, t_env **env_list)
 {
 	if (info->argc != 3)
 	{
@@ -108,7 +110,7 @@ int setenv_builtin(info_t *info)
 		return (EXIT_FAILURE);
 	}
 
-	if (!_setenv(info->argv[1], info->argv[2], 1))
+	if (!_setenv(info->argv[1], info->argv[2], 1, env_list))
 	{
 		printf("Error: setenv failed\n");
 		return (EXIT_FAILURE);
@@ -122,7 +124,7 @@ int setenv_builtin(info_t *info)
  *
  * Return: 0 on success, 1 on failure
  */
-int unsetenv_builtin(info_t *info)
+int unsetenv_builtin(info_t *info, t_env **env_list)
 {
 	if (info->argc != 2)
 	{
@@ -130,7 +132,7 @@ int unsetenv_builtin(info_t *info)
 		return (EXIT_FAILURE);
 	}
 
-	if (!_unsetenv(info->argv[1]))
+	if (!_unsetenv(info->argv[1], env_list))
 	{
 		printf("Error: unsetenv failed\n");
 		return (EXIT_FAILURE);

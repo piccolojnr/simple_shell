@@ -26,7 +26,7 @@ char **split_env(char *str)
     }
 
     /* Split the string using the delimiter */
-    token = strtok(str_copy, delimiter);
+    token = _strtok(str_copy, delimiter);
     if (token)
     {
         name = _strdup(token);
@@ -37,7 +37,7 @@ char **split_env(char *str)
             return NULL;
         }
 
-        token = strtok(NULL, delimiter);
+        token = _strtok(NULL, delimiter);
         if (token)
         {
             value = _strdup(token);
@@ -80,8 +80,8 @@ char **split_env(char *str)
 char *concat_path_and_cmd(const char *path, const char *cmd)
 {
     /* Calculate the total length needed for the result */
-    size_t path_len = _strlen(path);
-    size_t cmd_len = _strlen(cmd);
+    size_t path_len = _strlen((char *)path);
+    size_t cmd_len = _strlen((char *)cmd);
     /* +1 for '/' and +1 for '\0' */
     size_t result_len = path_len + 1 + cmd_len + 1;
 

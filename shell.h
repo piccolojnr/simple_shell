@@ -1,7 +1,7 @@
 #ifndef SHELL_H
 #define SHELL_H
 
-#define MAX_PATH_LENGTH 1024
+#define MAX__LENGTH 1024
 #define BUFFER_SIZE 128
 
 #include <stdio.h>
@@ -34,6 +34,7 @@ typedef struct env_list
  * @line_len: length of line
  * @char_len: length of char in line
  * @is_built_in: return value of built-in
+ * @env_list: linked list of environment variables
  */
 typedef struct command_info
 {
@@ -56,23 +57,20 @@ typedef struct command_info
 typedef struct tbt
 {
 	char *type;
-	int (*func)(info_t *);
+	int (*func)(info_t *, t_env **);
 } builtin_table;
 
 /* environment */
 extern char **environ;
-extern t_env *env_list;
-
-t_env *env_list = NULL;
 
 /* run_shell */
-void run_shell(void);
-void find_executable(info_t **info);
+void run_shell(t_env **);
+void find_executable(info_t **, t_env **);
 
 /* _getline */
-ssize_t _getline(char **lineptr, size_t *n, FILE *stream);
-void get_input(info_t *info);
-void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size);
+ssize_t _getline(char **, size_t *, FILE *);
+void get_input(info_t *);
+void *_realloc(void *, unsigned int, unsigned int);
 
 /* executable_cmd */
 void execute_command(info_t *);
@@ -94,37 +92,41 @@ int _strncmp(char *, char *, int);
 char *_strcat(char *, const char *);
 
 /* builtin */
-int find_builtin(info_t **);
-void replace_env_var(info_t **info);
+int find_builtin(info_t *, t_env **);
+void replace_env_var(info_t **, t_env *);
+void replace_args(info_t **info);
 
 /* built_in */
-int which_builtin(info_t *);
-int exit_builtin(info_t *);
-int env_builtin(info_t *info);
-int setenv_builtin(info_t *info);
-int unsetenv_builtin(info_t *info);
+int which_builtin(info_t *, t_env **);
+int exit_builtin(info_t *, t_env **);
+int env_builtin(info_t *, t_env **);
+int setenv_builtin(info_t *, t_env **);
+int unsetenv_builtin(info_t *, t_env **);
 
 /* get_env */
-char *_getenv(const char *name);
-int _setenv(const char *name, const char *value, int overwrite);
-int _unsetenv(const char *name);
+char *_getenv(const char *, t_env *);
+int _setenv(const char *, const char *, int, t_env **);
+int _unsetenv(const char *, t_env **);
 
 /* helper */
-char *allocate_and_copy(const char *str, int length);
-int count_words(const char *str, char *delim);
+char *allocate_and_copy(const char *, int);
+int count_words(const char *, char *);
 int is_delim(char, char *);
-int _atoi(char *s);
-void exit_shell(info_t *info, int exit_status);
+int _atoi(char *);
+void exit_shell(info_t *, int);
 
 /** helper 1*/
-char **split_env(char *str);
-char *concat_path_and_cmd(const char *path, const char *cmd);
+char **split_env(char *);
+char *concat_path_and_cmd(const char *, const char *);
 
 /* lists */
-int create_env_list();
-int add_node_end(const char *name, const char *value);
-void free_env_list(t_env *head);
-int edit_node(char *name, char *new_value);
-int remove_node(char *name);
+int create_env_list(t_env **);
+int add_node_end(const char *, const char *, t_env **);
+void free_env_list(t_env *);
+int edit_node(char *, char *, t_env **);
+int remove_node(char *, t_env **);
+
+/* _strtok */
+char *_strtok(char *str, const char *delim);
 
 #endif /* SHELL_H */
