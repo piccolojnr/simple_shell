@@ -99,13 +99,13 @@ char *_strncat(char *dest, const char *src, int n)
 	return (result);
 }
 /**
- * find_n_occ - finds the number of occurences of a substring
+ * find_num_sub - finds the number of occurences of a substring
  * @str: the string to search
  * @sub: the substring to find
  *
  * Return: the number of occurences of the substring
  */
-int find_n_occ(char *str, char *sub)
+int find_num_sub(char *str, char *sub)
 {
 	char *tokenized = NULL, *new = NULL;
 	int i = 0;
@@ -136,7 +136,7 @@ int find_n_occ(char *str, char *sub)
 int replace_str(char **str, char *orig, char *rep)
 {
 	char *tokenized, *tmp, *new = _malloc(1);
-	int _rep = 0, tor = find_n_occ(*str, orig), newlen = 0;
+	int _rep = 0, tor = find_num_sub(*str, orig), newlen = 0;
 
 	if (tor == 0)
 		return (0);

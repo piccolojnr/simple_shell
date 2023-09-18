@@ -6,13 +6,15 @@
  *
  * Return: 1 if found, 0 if not
  */
-int which_builtin(info_t *info, t_env **env_list)
+int which_builtin(info_t *info, t_env **env_list, alias_t **alias_list)
 {
 	int i, j, k;
 	char *path;
 	char **paths = NULL;
 	struct stat file_stat;
 	char *filepath; /* Adjust the buffer size as needed */
+
+	(void)alias_list;
 
 	if (info->argc < 2)
 	{
@@ -52,11 +54,12 @@ int which_builtin(info_t *info, t_env **env_list)
  *
  * Return: 0 on success, 1 on failure
  */
-int exit_builtin(info_t *info, t_env **env_list)
+int exit_builtin(info_t *info, t_env **env_list, alias_t **alias_list)
 {
 	int exit_status;
 
 	(void)env_list;
+	(void)alias_list;
 
 	if (info->argc > 2)
 	{
@@ -82,11 +85,12 @@ int exit_builtin(info_t *info, t_env **env_list)
  *
  * Return: 0 on success, 1 on failure
  */
-int env_builtin(info_t *info, t_env **env_list)
+int env_builtin(info_t *info, t_env **env_list, alias_t **alias_list)
 {
 	t_env *current = *env_list;
 
 	(void)info;
+	(void)alias_list;
 
 	if (*env_list == NULL)
 		return (1);
@@ -110,8 +114,10 @@ int env_builtin(info_t *info, t_env **env_list)
  *
  * Return: 0 on success, 1 on failure
  */
-int setenv_builtin(info_t *info, t_env **env_list)
+int setenv_builtin(info_t *info, t_env **env_list, alias_t **alias_list)
 {
+	(void)alias_list;
+
 	if (info->argc != 3)
 	{
 		_printf("Usage: setenv varname varvalue\n");
@@ -133,8 +139,10 @@ int setenv_builtin(info_t *info, t_env **env_list)
  *
  * Return: 0 on success, 1 on failure
  */
-int unsetenv_builtin(info_t *info, t_env **env_list)
+int unsetenv_builtin(info_t *info, t_env **env_list, alias_t **alias_list)
 {
+	(void)alias_list;
+
 	if (info->argc != 2)
 	{
 		_printf("Usage: unsetenv varname\n");

@@ -6,6 +6,7 @@ int run_shell(t_env **env_list, char *name)
 {
 	int shell_status = 1, i;
 	info_t *info = malloc(sizeof(info_t));
+	alias_t *alias_list = NULL;
 	char *line, *filtered_line, **args, *trimmed, *delim = ";";
 	size_t char_len = 0;
 	(void)name;
@@ -38,7 +39,7 @@ int run_shell(t_env **env_list, char *name)
 
 			if (args[i] != NULL && !is_line_empty(args[i]))
 			{
-				handle_logical_operators(args[i], &info, env_list);
+				handle_logical_operators(args[i], &info, env_list, &alias_list);
 			}
 		}
 	}
@@ -53,7 +54,7 @@ int run_shell(t_env **env_list, char *name)
  *
  * Return: 1 on success, 0 on failure
  */
-int handle_logical_operators(char *line, info_t **info, t_env **env_list)
+int handle_logical_operators(char *line, info_t **info, t_env **env_list, alias_t **alias_list)
 {
 	int success = EXIT_SUCCESS, is_and_operator, len, start = 0, end = 0;
 	char *tmp;
@@ -72,7 +73,7 @@ int handle_logical_operators(char *line, info_t **info, t_env **env_list)
 
 			(*info)->line = tmp;
 			(*info)->char_len = _strlen(tmp) + 1;
-			if (!execute_logical_command(info, env_list, is_and_operator))
+			if (!execute_logical_command(info, env_list, alias_list, is_and_operator))
 			{
 				success = EXIT_FAILURE;
 				free(tmp);
@@ -90,7 +91,7 @@ int handle_logical_operators(char *line, info_t **info, t_env **env_list)
 
 	(*info)->line = tmp;
 	(*info)->char_len = _strlen(tmp) + 1;
-	if (!execute_logical_command(info, env_list, is_and_operator))
+	if (!execute_logical_command(info, env_list, alias_list, is_and_operator))
 	{
 		success = EXIT_FAILURE;
 		free(tmp);
@@ -145,7 +146,7 @@ char *filter_comments(const char *line)
  *
  * Return: The exit status of the process
  */
-int start_process(info_t **info, t_env **env_list)
+int start_process(info_t **info, t_env **env_list, alias_t **alias_list)
 {
 	int exit_status;
 	/* Remove newline */
@@ -163,7 +164,7 @@ int start_process(info_t **info, t_env **env_list)
 		return (EXIT_FAILURE);
 
 	/* Check if the command exists in the PATH and execute it */
-	find_executable(info, env_list);
+	find_executable(info, env_list, alias_list);
 	if ((*info)->path != NULL && (*info)->is_built_in == -1)
 	{
 		exit_status = execute_command(info);
@@ -183,7 +184,7 @@ int start_process(info_t **info, t_env **env_list)
  * find_executable - Finds an executable in the PATH
  * @info: A pointer to a info_t struct
  */
-void find_executable(info_t **info, t_env **env_list)
+void find_executable(info_t **info, t_env **env_list, alias_t **alias_list)
 {
 	int i, path_len;
 	char *path;
@@ -191,7 +192,7 @@ void find_executable(info_t **info, t_env **env_list)
 	char *path_with_cmd;
 
 	/* check for built ins */
-	(*info)->is_built_in = find_builtin(*info, env_list);
+	(*info)->is_built_in = find_builtin(*info, env_list, alias_list);
 	if ((*info)->is_built_in != -1)
 		return;
 	path = _getenv("PATH", *env_list);

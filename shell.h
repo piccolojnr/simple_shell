@@ -3,6 +3,8 @@
 
 #define MAX__LENGTH 1024
 #define BUFFER_SIZE 1024
+#define MAX_ALIASES 50
+#define MAX_ALIAS_LEN 100
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,6 +17,20 @@
 #include <signal.h>
 #include <errno.h>
 #include <fcntl.h>
+
+/**
+ * struct alias_list - linked list of aliases
+ * @alias: alias
+ * @value: value of alias
+ */
+typedef struct alias_list
+{
+	char *name;
+	char *value;
+
+	struct alias_list *next;
+} alias_t;
+
 /**
  * struct env_list - linked list of environment variables
  * @name: name of environment variable
@@ -59,7 +75,7 @@ typedef struct command_info
 typedef struct tbt
 {
 	char *type;
-	int (*func)(info_t *, t_env **);
+	int (*func)(info_t *, t_env **, alias_t **);
 } builtin_table;
 
 /* environment */
@@ -67,10 +83,10 @@ extern char **environ;
 
 /* run_shell */
 int run_shell(t_env **, char *);
-int start_process(info_t **, t_env **);
-void find_executable(info_t **, t_env **);
+int start_process(info_t **, t_env **, alias_t **);
+void find_executable(info_t **, t_env **, alias_t **);
 char *filter_comments(const char *);
-int handle_logical_operators(char *line, info_t **info, t_env **env_list);
+int handle_logical_operators(char *line, info_t **info, t_env **env_list, alias_t **);
 
 /* _getline */
 int _getline(char **, size_t *, int);
@@ -100,24 +116,25 @@ int _strcmp(char *, char *);
 int _strncmp(char *, char *, int);
 char *_strcat(char *, const char *);
 char *_strncat(char *, const char *, int);
-int find_n_occ(char *, char *);
+int find_num_sub(char *, char *);
 int replace_str(char **, char *, char *);
 char *trimWhitespace(const char *str);
 
 /* builtin */
-int find_builtin(info_t *, t_env **);
+int find_builtin(info_t *, t_env **, alias_t **);
 void replace_env_var(info_t **, t_env *);
 void replace_args(info_t **);
 
 /* built_in */
-int which_builtin(info_t *, t_env **);
-int exit_builtin(info_t *, t_env **);
-int env_builtin(info_t *, t_env **);
-int setenv_builtin(info_t *, t_env **);
-int unsetenv_builtin(info_t *, t_env **);
+int which_builtin(info_t *, t_env **, alias_t **);
+int exit_builtin(info_t *, t_env **, alias_t **);
+int env_builtin(info_t *, t_env **, alias_t **);
+int setenv_builtin(info_t *, t_env **, alias_t **);
+int unsetenv_builtin(info_t *, t_env **, alias_t **);
 
 /* built_in_1 */
-int chdir_builtin(info_t *, t_env **);
+int chdir_builtin(info_t *, t_env **, alias_t **);
+int alias_builtin(info_t *, t_env **, alias_t **);
 
 /* get_env */
 char *_getenv(const char *, t_env *);
@@ -138,14 +155,14 @@ int is_line_empty(const char *line);
 int isspace(int c);
 char *int_to_string(int num);
 int count_digits(int num);
-int execute_logical_command(info_t **info, t_env **env_list, int and_operator);
+int execute_logical_command(info_t **info, t_env **env_list, alias_t **, int and_operator);
 
-/* lists */
+/* env_lists */
 int create_env_list(t_env **);
-int add_node_end(const char *, const char *, t_env **);
+int add_env_node_end(const char *, const char *, t_env **);
 void free_env_list(t_env *);
-int edit_node(char *, char *, t_env **);
-int remove_node(char *, t_env **);
+int edit_env_node(char *, char *, t_env **);
+int remove_env_node(char *, t_env **);
 
 /* _strtok */
 char *_strtok(char *, const char *);
@@ -154,5 +171,16 @@ char *_strtok(char *, const char *);
 int _putchar(char);
 void _puts(char *);
 int _printf(const char *, ...);
+
+/* alias */
+void print_aliases(alias_t *);
+void print_specific_alias(alias_t *, char *);
+int define_alias(info_t *, int, alias_t **);
+alias_t *get_alias(alias_t *, char *);
+
+/* alias_lists */
+int add_alias_node_end(const char *, const char *, alias_t **);
+int edit_alias_node(char *, char *, alias_t **);
+int remove_alias_node(char *, alias_t **);
 
 #endif /* SHELL_H */

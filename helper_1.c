@@ -206,9 +206,9 @@ char *int_to_string(int num)
  *
  * Return: The exit status of the logical command.
  */
-int execute_logical_command(info_t **info, t_env **env_list, int and_operator)
+int execute_logical_command(info_t **info, t_env **env_list, alias_t **alias_list, int and_operator)
 {
-    int exit_status = start_process(info, env_list);
+    int exit_status = start_process(info, env_list, alias_list);
 
     if ((and_operator && exit_status == 0) || (!and_operator && exit_status != 0))
         return (1);

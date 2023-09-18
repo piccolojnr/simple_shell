@@ -27,7 +27,7 @@ int create_env_list(t_env **env_list)
 		name = args[0];
 		value = args[1];
 
-		if (!add_node_end(name, value, env_list))
+		if (!add_env_node_end(name, value, env_list))
 		{
 			free_env_list(head);
 			return (0);
@@ -37,13 +37,13 @@ int create_env_list(t_env **env_list)
 	return (1);
 }
 /**
- * add_node_end - adds a new node at the beginning
+ * add_env_node_end - adds a new node at the beginning
  * @name: name of the node
  * @value: value of the node
  *
  * Return: 1 on success, 0 on failure
  */
-int add_node_end(const char *name, const char *value, t_env **env_list)
+int add_env_node_end(const char *name, const char *value, t_env **env_list)
 {
 	t_env *new = (t_env *)malloc(sizeof(t_env));
 
@@ -65,12 +65,12 @@ int add_node_end(const char *name, const char *value, t_env **env_list)
 	return (1);
 }
 /**
- * remove_node - Removes a node with a specified name from a linked list
+ * remove_env_node - Removes a node with a specified name from a linked list
  * @name: name of the node to remove
  *
  * Return: 1 on success, 0 on failure
  */
-int remove_node(char *name, t_env **env_list)
+int remove_env_node(char *name, t_env **env_list)
 {
 	t_env *current = *env_list;
 	t_env *prev = NULL;
@@ -98,13 +98,13 @@ int remove_node(char *name, t_env **env_list)
 	return (0);
 }
 /**
- * edit_node - Finds and edits a node in a linked list
+ * edit_env_node - Finds and edits a node in a linked list
  * @name: Name of the node to edit
  * @new_value: New value to set for the node
  *
  * Return: 1 on success, 0 on failure
  */
-int edit_node(char *name, char *new_value, t_env **env_list)
+int edit_env_node(char *name, char *new_value, t_env **env_list)
 {
 	t_env *current = *env_list;
 
