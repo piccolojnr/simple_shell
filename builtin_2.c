@@ -4,76 +4,30 @@
  * chdir_builtin - Change the current working directory.
  * @info: Pointer to the info_t struct containing command info.
  * @env_list: Pointer to the environment variable linked list (not used here).
+ * @alias_list: Pointer to the alias linked list (not used here).
  *
  * Return: 0 on success, 1 on failure.
  */
 int chdir_builtin(info_t *info, t_env **env_list, alias_t **alias_list)
 {
-    char *oldpwd, *newpwd, *pwd;
-
     (void)alias_list;
 
-    /* Check the number of arguments */
     if (info->argc != 2)
     {
         _printf("Usage: cd <directory>\n");
-        return (1); /* Return an error code */
-    }
-
-    if (strcmp((const char *)info->argv[1], "-") == 0)
-    {
-        oldpwd = _getenv("OLDPWD", *env_list);
-        if (oldpwd)
-        {
-            free(info->argv[1]);
-            info->argv[1] = oldpwd;
-            return (chdir_builtin(info, env_list, alias_list));
-        }
-    }
-
-    pwd = _strdup(info->argv[1]);
-
-    /* Save the current working directory in the oldpwd variable */
-    oldpwd = _getenv("PWD", *env_list);
-    if (oldpwd)
-    {
-        if (_setenv("OLDPWD", oldpwd, 1, env_list) == 0)
-        {
-            perror("OLDPWD setting failed");
-            return 1; /* Return an error code */
-        }
-    }
-
-    /* Attempt to change the current directory */
-    if (chdir(pwd) == -1)
-    {
-        free(pwd);
-        perror("chdir");
         return 1; /* Return an error code */
     }
 
-    /* Update the PWD environment variable */
-    newpwd = getcwd(NULL, 0);
-    if (newpwd)
+    char *target_directory = info->argv[1];
+
+    if (strcmp(target_directory, "-") == 0)
     {
-        if (_setenv("PWD", newpwd, 1, env_list) == 0)
-        {
-            perror("PWD setting failed");
-            free(pwd);
-            free(newpwd);
-            return 1; /* Return an error code */
-        }
-        free(newpwd);
+        return handleDash(info, env_list);
     }
     else
     {
-        free(pwd);
-        perror("getcwd");
-        return 1; /* Return an error code */
+        return changeDirectory(target_directory, env_list);
     }
-
-    free(pwd);
-    return (0); /* Return success */
 }
 /**
  * alias_builtin - Define or display aliases.

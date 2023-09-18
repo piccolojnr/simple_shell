@@ -2,6 +2,8 @@
 /**
  * execute_command - executes a command
  * @info: command info
+ *
+ * Return: EXIT_SUCCESS or EXIT_FAILURE
  */
 int execute_command(info_t **info)
 {

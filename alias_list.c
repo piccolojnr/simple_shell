@@ -8,7 +8,8 @@
  *
  * Return: 1 on success, 0 on failure
  */
-int add_alias_node_end(const char *name, const char *value, alias_t **alias_list)
+int add_alias_node_end(const char *name, const char *value,
+									alias_t **alias_list)
 {
 	alias_t *new = (alias_t *)malloc(sizeof(alias_t));
 

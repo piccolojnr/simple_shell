@@ -1,6 +1,10 @@
 #include "shell.h"
 /**
  * run_shell - Runs the shell
+ * @env_list: ...
+ * @name: name of program
+ *
+ * Return: 0 for success, 1 for failure
  */
 int run_shell(t_env **env_list, char *name)
 {
@@ -14,7 +18,6 @@ int run_shell(t_env **env_list, char *name)
 	while (shell_status)
 	{
 		_printf("piccolojnr@:~$ ");
-
 		get_input(info, &line, &char_len, fileno(stdin));
 
 		if (is_line_empty(line))
@@ -23,7 +26,6 @@ int run_shell(t_env **env_list, char *name)
 		filtered_line = filter_comments(line);
 		if (filtered_line == NULL)
 			continue;
-
 		free(line);
 
 		split_str(filtered_line, &args, delim);
@@ -51,26 +53,27 @@ int run_shell(t_env **env_list, char *name)
  * @line: The logical operator string
  * @info: A pointer to a info_t struct
  * @env_list: A pointer to a env_t struct
+ * @alias_list: A pointer to a alias_t struct
  *
  * Return: 1 on success, 0 on failure
  */
-int handle_logical_operators(char *line, info_t **info, t_env **env_list, alias_t **alias_list)
+int handle_logical_operators(char *line, info_t **info,
+					t_env **env_list, alias_t **alias_list)
 {
 	int success = EXIT_SUCCESS, is_and_operator, len, start = 0, end = 0;
 	char *tmp;
 
 	while (line[end] != '\0')
 	{
-		if ((line[end] == '&' && line[end + 1] == '&') || (line[end] == '|' && line[end + 1] == '|'))
+		if ((line[end] == '&' && line[end + 1] == '&') ||
+						(line[end] == '|' && line[end + 1] == '|'))
 		{
 			if (line[end + 1] == '&')
 				is_and_operator = 1;
 			else
 				is_and_operator = 0;
-
 			len = end - (start + 1);
 			tmp = _strndup(line + start, len);
-
 			(*info)->line = tmp;
 			(*info)->char_len = _strlen(tmp) + 1;
 			if (!execute_logical_command(info, env_list, alias_list, is_and_operator))
@@ -82,13 +85,10 @@ int handle_logical_operators(char *line, info_t **info, t_env **env_list, alias_
 			free(tmp);
 			start = end + 2;
 		}
-
 		end++;
 	}
-
 	len = end - start;
 	tmp = _strndup(line + start, len);
-
 	(*info)->line = tmp;
 	(*info)->char_len = _strlen(tmp) + 1;
 	if (!execute_logical_command(info, env_list, alias_list, is_and_operator))
@@ -98,7 +98,6 @@ int handle_logical_operators(char *line, info_t **info, t_env **env_list, alias_
 		return (success);
 	}
 	free(tmp);
-
 	return (success);
 }
 /**
@@ -114,19 +113,21 @@ char *filter_comments(const char *line)
 	size_t len;
 
 	if (line == NULL)
-		return NULL;
+		return (NULL);
 
 	/*Find the position of the '#' character in the string*/
 	commentPos = (const char *)_strchr((char *)line, '#');
 
 	if (commentPos == NULL)
-		return _strdup(line);
+	{
+		return (_strdup(line));
+	}
 	else
 	{
 		/*Calculate the length of the portion before the comment character*/
 		len = commentPos - line;
 
-		/*Allocate memory for the new string (excluding the comment and null terminator)*/
+		/*Allocate memory for the new string */
 		new_line = (char *)malloc(len + 1);
 
 		if (new_line != NULL)
@@ -136,13 +137,14 @@ char *filter_comments(const char *line)
 			new_line[len] = '\0'; /*Null-terminate the new string*/
 		}
 
-		return new_line;
+		return (new_line);
 	}
 }
 /**
  * start_process - Starts a process
  * @info: A pointer to a info_t struct
  * @env_list: A pointer to a env_t struct
+ * @alias_list: A pointer to a alias_t struct
  *
  * Return: The exit status of the process
  */
@@ -183,6 +185,8 @@ int start_process(info_t **info, t_env **env_list, alias_t **alias_list)
 /**
  * find_executable - Finds an executable in the PATH
  * @info: A pointer to a info_t struct
+ * @env_list: A pointer to a env_t struct
+ * @alias_list: A pointer to a alias_t struct
  */
 void find_executable(info_t **info, t_env **env_list, alias_t **alias_list)
 {
@@ -205,7 +209,8 @@ void find_executable(info_t **info, t_env **env_list, alias_t **alias_list)
 
 	for (i = 0; i < path_len; i++)
 	{
-		path_with_cmd = (char *)malloc(strlen(path_buffer[i]) + strlen((*info)->argv[0]) + 2);
+		path_with_cmd = (char *)malloc(strlen(path_buffer[i])
+					+ strlen((*info)->argv[0]) + 2);
 		if (path_with_cmd == NULL)
 		{
 			perror("Memory allocation error");

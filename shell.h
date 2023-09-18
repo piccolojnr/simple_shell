@@ -20,14 +20,14 @@
 
 /**
  * struct alias_list - linked list of aliases
- * @alias: alias
+ * @name: alias
  * @value: value of alias
+ * @next: ...
  */
 typedef struct alias_list
 {
 	char *name;
 	char *value;
-
 	struct alias_list *next;
 } alias_t;
 
@@ -52,7 +52,7 @@ typedef struct env_list
  * @argv: arguments
  * @char_len: length of char in line
  * @is_built_in: return value of built-in
- * @env_list: linked list of environment variables
+ * @status: status of process
  */
 typedef struct command_info
 {
@@ -60,9 +60,7 @@ typedef struct command_info
 	int argc;
 	char **argv;
 	char *path;
-
 	int char_len;
-
 	int is_built_in;
 	int status;
 } info_t;
@@ -86,7 +84,8 @@ int run_shell(t_env **, char *);
 int start_process(info_t **, t_env **, alias_t **);
 void find_executable(info_t **, t_env **, alias_t **);
 char *filter_comments(const char *);
-int handle_logical_operators(char *line, info_t **info, t_env **env_list, alias_t **);
+int handle_logical_operators(char *line, info_t **info,
+							t_env **env_list, alias_t **);
 
 /* _getline */
 int _getline(char **, size_t *, int);
@@ -102,18 +101,18 @@ void handle_execution_error(info_t **info);
 /* string */
 int split_str(char *, char ***, char *);
 void free_args(char **);
+char *_strcpy(char *, const char *);
+char *_strncpy(char *, const char *, int n);
+int _strlen(char *);
 
 /* string 2*/
-char *_strcpy(char *, const char *);
-int _strlen(char *);
 char *_strdup(const char *);
 char *_strndup(const char *, int);
 char *_strchr(char *, char);
-char *_strncpy(char *, const char *, int n);
-
-/* string 3*/
 int _strcmp(char *, char *);
 int _strncmp(char *, char *, int);
+
+/* string 3*/
 char *_strcat(char *, const char *);
 char *_strncat(char *, const char *, int);
 int find_num_sub(char *, char *);
@@ -124,15 +123,21 @@ char *trimWhitespace(const char *str);
 int find_builtin(info_t *, t_env **, alias_t **);
 void replace_env_var(info_t **, t_env *);
 void replace_args(info_t **);
+void replace_with_env_var(info_t **info, int index, const char *env_name,
+							t_env *env_list);
+void replace_with_status(info_t **info, int index);
+void replace_with_pid(info_t **info, int index, pid_t shell_pid);
 
-/* built_in */
+
+
+/* builtin_1 */
 int which_builtin(info_t *, t_env **, alias_t **);
 int exit_builtin(info_t *, t_env **, alias_t **);
 int env_builtin(info_t *, t_env **, alias_t **);
 int setenv_builtin(info_t *, t_env **, alias_t **);
 int unsetenv_builtin(info_t *, t_env **, alias_t **);
 
-/* built_in_1 */
+/* builtin_2 */
 int chdir_builtin(info_t *, t_env **, alias_t **);
 int alias_builtin(info_t *, t_env **, alias_t **);
 
@@ -154,8 +159,11 @@ char *concat_path_and_cmd(const char *, const char *);
 int is_line_empty(const char *line);
 int isspace(int c);
 char *int_to_string(int num);
+
+/* helper 2*/
 int count_digits(int num);
-int execute_logical_command(info_t **info, t_env **env_list, alias_t **, int and_operator);
+int execute_logical_command(info_t **info,
+		t_env **env_list, alias_t **, int and_operator);
 
 /* env_lists */
 int create_env_list(t_env **);
@@ -182,5 +190,9 @@ alias_t *get_alias(alias_t *, char *);
 int add_alias_node_end(const char *, const char *, alias_t **);
 int edit_alias_node(char *, char *, alias_t **);
 int remove_alias_node(char *, alias_t **);
+
+/* chdir */
+int change_directory(const char *, t_env **);
+int handle_dash(info_t *, t_env **);
 
 #endif /* SHELL_H */

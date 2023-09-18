@@ -2,6 +2,8 @@
 /**
  * find_builtin - finds a builtin command
  * @info: the parameter & return info struct
+ * @env_list: ...
+ * @alias_list: ...
  *
  * Return: -1 if builtin not found,
  *			0 if builtin executed successfully,
@@ -37,65 +39,91 @@ int find_builtin(info_t *info, t_env **env_list, alias_t **alias_list)
 /**
  * replace_env_var - Replaces environment variable references in argv
  * @info: Pointer to the info_t structure
+ * @env_list: Pointer to the linked list of environment variables
  */
 void replace_env_var(info_t **info, t_env *env_list)
 {
-	int i;
-	char *env_name, *env_value, *new_arg;
-	pid_t shell_pid = getpid();
+    pid_t shell_pid = getpid();
 
-	for (i = 0; i < (*info)->argc; i++)
-	{
-		if ((*info)->argv[i][0] == '$' && (*info)->argv[i][1] != '\0' && (*info)->argv[i][1] != '\n')
-		{
-			env_name = (*info)->argv[i] + 1; /* Skip the '$' symbol */
-			if (_strcmp(env_name, "$") == 0)
-			{
-				new_arg = int_to_string((int)shell_pid);
-				if (new_arg == NULL)
-				{
-					perror("int_to_string");
-					exit_shell(*info, EXIT_FAILURE);
-				}
-				free((*info)->argv[i]);
-				(*info)->argv[i] = new_arg;
-			}
-			else if (_strcmp(env_name, "?") == 0)
-			{
-				new_arg = int_to_string((*info)->status);
-				if (new_arg == NULL)
-				{
-					perror("int_to_string");
-					exit_shell(*info, EXIT_FAILURE);
-				}
-				free((*info)->argv[i]);
-				(*info)->argv[i] = new_arg;
-			}
-			else
-			{
-				env_value = _getenv(env_name, env_list);
+    for (int i = 0; i < (*info)->argc; i++)
+    {
+        if ((*info)->argv[i][0] == '$' && (*info)->argv[i][1] != '\0' && (*info)->argv[i][1] != '\n')
+        {
+            char *env_name = (*info)->argv[i] + 1; /* Skip the '$' symbol */
 
-				if (env_value)
-				{
-					new_arg = _strdup(env_value);
-					if (!new_arg)
-					{
-						perror("strdup");
-						exit_shell(*info, EXIT_FAILURE); /* Handle memory allocation failure */
-					}
-					free((*info)->argv[i]);		/* Free the old argument */
-					(*info)->argv[i] = new_arg; /* Assign the new argument */
-				}
-				else
-				{
-					/* Environment variable not found, set the argument to NULL */
-					free((*info)->argv[i]); /* Free the old argument */
-					(*info)->argv[i] = NULL;
-				}
-			}
-		}
-	}
-	replace_args(info); /* Replace $n references in argv */
+            if (_strcmp(env_name, "$") == 0)
+                replaceWithPid(info, i, shell_pid);
+            else if (_strcmp(env_name, "?") == 0)
+                replaceWithStatus(info, i);
+            else
+                replaceWithEnvVar(info, i, env_name, env_list);
+        }
+    }
+
+    replace_args(info); /* Replace $n references in argv */
+}
+/**
+ * replace_with_pid - ...
+ * @info: ...
+ * @index: ...
+ * @shell_pid: ...
+*/
+void replace_with_pid(info_t **info, int index, pid_t shell_pid)
+{
+    char *new_arg = int_to_string((int)shell_pid);
+    if (new_arg == NULL)
+    {
+        perror("int_to_string");
+        exit_shell(*info, EXIT_FAILURE);
+    }
+    free((*info)->argv[index]);
+    (*info)->argv[index] = new_arg;
+}
+/**
+ * replace_with_status - ...
+ * @info: ...
+ * @index: ...
+*/
+void replace_with_status(info_t **info, int index)
+{
+    char *new_arg = int_to_string((*info)->status);
+    if (new_arg == NULL)
+    {
+        perror("int_to_string");
+        exit_shell(*info, EXIT_FAILURE);
+    }
+    free((*info)->argv[index]);
+    (*info)->argv[index] = new_arg;
+}
+/**
+ * replace_with_env_var - ...
+ * @info: ...
+ * @index: ...
+ * @env_name: ...
+ * @env_list: ...
+*/
+void replace_with_env_var(info_t **info, int index, const char *env_name,
+							t_env *env_list)
+{
+    char *env_value = _getenv(env_name, env_list);
+
+    if (env_value)
+    {
+        char *new_arg = _strdup(env_value);
+        if (!new_arg)
+        {
+            perror("strdup");
+            exit_shell(*info, EXIT_FAILURE); /* Handle memory allocation failure */
+        }
+        free((*info)->argv[index]); /* Free the old argument */
+        (*info)->argv[index] = new_arg; /* Assign the new argument */
+    }
+    else
+    {
+        /* Environment variable not found, set the argument to NULL */
+        free((*info)->argv[index]); /* Free the old argument */
+        (*info)->argv[index] = NULL;
+    }
 }
 /**
  * replace_args - Replaces $n references in argv with their

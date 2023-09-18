@@ -4,9 +4,6 @@
  * @str: The string to split.
  *
  * Return: A pointer to an array of strings containing name and value.
- *         The first element is the name, and the second element is the value.
- *         Returns NULL on failure or if the input string is not in the format
- *         "name=value".
  */
 char **split_env(char *str)
 {
@@ -15,26 +12,21 @@ char **split_env(char *str)
     const char *delimiter = "=";
 
     if (!str)
-        return NULL;
-
-    /* Make a copy of the input string to avoid modifying it */
+        return (NULL);
     str_copy = _strdup(str);
     if (!str_copy)
     {
-        perror("Memory allocation failed");
-        return NULL;
+        perror("strdup");
+        return (NULL);
     }
-
-    /* Split the string using the delimiter */
     token = _strtok(str_copy, delimiter);
     if (token)
     {
         name = _strdup(token);
         if (!name)
         {
-            perror("Memory allocation failed");
-            free(str_copy);
-            return NULL;
+            perror("strdup"), free(str_copy);
+            return (NULL);
         }
 
         token = _strtok(NULL, delimiter);
@@ -43,32 +35,20 @@ char **split_env(char *str)
             value = _strdup(token);
             if (!value)
             {
-                perror("Memory allocation failed");
-                free(name);
-                free(str_copy);
-                return NULL;
+                perror("strdup"), free(name), free(str_copy);
+                return (NULL);
             }
         }
     }
-
-    /* Allocate memory for the result array */
     result = (char **)malloc(sizeof(char *) * 2);
     if (!result)
     {
-        perror("Memory allocation failed");
-        free(name);
-        free(value);
-        free(str_copy);
-        return NULL;
+        perror("malloc"), free(name), free(value), free(str_copy);
+        return (NULL);
     }
-
-    /* Set the result array elements */
-    result[0] = name;
-    result[1] = value;
-
-    /* Clean up and return the result */
+    result[0] = name, result[1] = value, result[2] = NULL;
     free(str_copy);
-    return result;
+    return (result);
 }
 /**
  * concat_path_and_cmd - Concatenates a path and command.
@@ -100,11 +80,12 @@ char *concat_path_and_cmd(const char *path, const char *cmd)
     /* Concatenate the command */
     _strcat(result, cmd);
 
-    return result;
+    return (result);
 }
 /**
  * is_line_empty - Checks if a line is empty.
  * @line: The line to check.
+ *
  * Return: 1 if the line is empty, otherwise 0.
  */
 int is_line_empty(const char *line)
@@ -124,25 +105,7 @@ int isspace(int c)
 {
     return (c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r' || c == '\0');
 }
-#include <stdio.h>
-#include <stdbool.h>
-/**
- * count_digits - Counts the number of digits in an integer.
- * @num: The integer to count.
- *
- * Return: The number of digits in the integer.
- */
-int count_digits(int num)
-{
-    int count = 0;
 
-    while (num != 0)
-    {
-        num /= 10;
-        count++;
-    }
-    return count;
-}
 /**
  * int_to_string - Converts an integer to a string.
  * @num: The integer to convert.
@@ -198,20 +161,4 @@ char *int_to_string(int num)
         str[0] = '-';
     }
     return (str);
-}
-/**
- * execute_logical_command - Executes a logical command.
- * @info: A pointer to the info structure.
- * @and_operator: The operator of the logical command.
- *
- * Return: The exit status of the logical command.
- */
-int execute_logical_command(info_t **info, t_env **env_list, alias_t **alias_list, int and_operator)
-{
-    int exit_status = start_process(info, env_list, alias_list);
-
-    if ((and_operator && exit_status == 0) || (!and_operator && exit_status != 0))
-        return (1);
-    else
-        return (0);
 }

@@ -1,7 +1,7 @@
 #include "shell.h"
 /**
  * print_aliases - prints all aliases
- * @aliases: aliases
+ * @alias_list: aliases
  */
 void print_aliases(alias_t *alias_list)
 {
@@ -15,8 +15,8 @@ void print_aliases(alias_t *alias_list)
 }
 /**
  * print_specific_alias - prints specific alias
- * @aliases: aliases
- * @alias: alias
+ * @alias_list: aliases
+ * @name: alias
  */
 void print_specific_alias(alias_t *alias_list, char *name)
 {
@@ -55,6 +55,7 @@ alias_t *get_alias(alias_t *alias_list, char *name)
 /**
  * define_alias - defines alias
  * @info: info
+ * @i: i
  * @alias_list: alias
  *
  * Return: 1 on success, 0 on failure

@@ -1,51 +1,5 @@
 #include "shell.h"
 /**
- * _strcmp - performs lexicogarphic comparison of two strangs.
- * @s1: the first strang
- * @s2: the second strang
- *
- * Return: negative if s1 < s2, positive if s1 > s2, zero if s1 == s2
- */
-int _strcmp(char *s1, char *s2)
-{
-	while (*s1 && *s2)
-	{
-		if (*s1 != *s2)
-			return (*s1 - *s2);
-		s1++;
-		s2++;
-	}
-	if (*s1 == *s2)
-		return (0);
-	else
-		return (*s1 < *s2 ? -1 : 1);
-}
-/**
- * _strncmp  - compares two strangs.
- * @s1: the first strang
- * @s2: the second strang
- * @n: the number of bytes to compare
- *
- * Return: negative if s1 < s2, positive if s1 > s2, zero if s1 == s2
- */
-int _strncmp(char *s1, char *s2, int n)
-{
-	int i = 0;
-
-	while (*s1 && *s2 && i < n - 1)
-	{
-		if (*s1 != *s2)
-			return (*s1 - *s2);
-		s1++;
-		s2++;
-		i++;
-	}
-	if (*s1 == *s2)
-		return (0);
-	else
-		return (*s1 < *s2 ? -1 : 1);
-}
-/**
  * _strcat - Concatenate two strings.
  * @dest: Destination string where the result is stored.
  * @src: Source string to be concatenated to the destination.
@@ -157,12 +111,13 @@ int replace_str(char **str, char *orig, char *rep)
 	return (0);
 }
 
+
 /**
- * trimwhitespace - removes leading and trailing whitespace
+ * trimWhitespace - removes leading and trailing whitespace from a string
  * @str: the string to trim
  *
- * Return: the trimmed string
- */
+ * Return: a pointer to the trimmed string
+*/
 char *trimWhitespace(const char *str)
 {
 	size_t len, trimmedLen;

@@ -2,6 +2,9 @@
 /**
  * get_input - get input from user
  * @info: struct with variables
+ * @buffer: buffer with commands
+ * @characters: number of characters
+ * @fd: file descriptor
  */
 void get_input(info_t *info, char **buffer, size_t *characters, int fd)
 {
@@ -21,8 +24,7 @@ void get_input(info_t *info, char **buffer, size_t *characters, int fd)
 /**
  * _realloc - reallocate a buffer
  * @ptr: pointer to the buffer
- * @new_size: new size of the buffer
- * @old_size: old size of the buffer
+ * @size: new size of the buffer
  *
  * Return: pointer to the buffer
  */
@@ -97,6 +99,12 @@ void *_realloc2(void *ptr, unsigned int old_size, unsigned int new_size)
 
     return (mem);
 }
+/**
+ * _malloc - ...
+ * @size: ...
+ * 
+ * Return: ...
+*/
 void *_malloc(unsigned int size)
 {
     char *ptr = malloc(size);

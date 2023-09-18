@@ -1,6 +1,7 @@
 #include "shell.h"
 /**
  * create_env_list - creates a linked list of environment variables
+ * @env_list: pointer to a pointer to the head of the list
  *
  * Return: 1 on success, 0 on failure
  */
@@ -40,6 +41,7 @@ int create_env_list(t_env **env_list)
  * add_env_node_end - adds a new node at the beginning
  * @name: name of the node
  * @value: value of the node
+ * @env_list: pointer to a pointer to the head of the list
  *
  * Return: 1 on success, 0 on failure
  */
@@ -67,6 +69,7 @@ int add_env_node_end(const char *name, const char *value, t_env **env_list)
 /**
  * remove_env_node - Removes a node with a specified name from a linked list
  * @name: name of the node to remove
+ * @env_list: pointer to a pointer to the head of the list
  *
  * Return: 1 on success, 0 on failure
  */
@@ -101,6 +104,7 @@ int remove_env_node(char *name, t_env **env_list)
  * edit_env_node - Finds and edits a node in a linked list
  * @name: Name of the node to edit
  * @new_value: New value to set for the node
+ * @env_list: pointer to a pointer to the head of the list
  *
  * Return: 1 on success, 0 on failure
  */

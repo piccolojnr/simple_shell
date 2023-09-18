@@ -30,10 +30,12 @@ char *_getenv(const char *name, t_env *env_list)
  * @name: name of the environment variable
  * @value: value of the environment variable
  * @overwrite: overwrite the variable or not
+ * @env_list: pointer to a pointer to the head of the list
  *
  * Return: 1 on success, 0 on failure
  */
-int _setenv(const char *name, const char *value, int overwrite, t_env **env_list)
+int _setenv(const char *name, const char *value,
+					int overwrite, t_env **env_list)
 {
 	/* Input validation */
 	if (name == NULL || name[0] == '\0' || strchr((char *)name, '=') != NULL)
@@ -63,6 +65,7 @@ int _setenv(const char *name, const char *value, int overwrite, t_env **env_list
 /**
  * _unsetenv - deletes an environment variable
  * @name: name of the environment variable
+ * @env_list: pointer to a pointer to the head of the list
  *
  * Return: 1 on success, 0 on failure
  */

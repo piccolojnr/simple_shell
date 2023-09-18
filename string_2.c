@@ -1,5 +1,4 @@
 #include "shell.h"
-
 /**
  * _strdup - duplicates a string
  * @str: the string to duplicate
@@ -50,70 +49,6 @@ char *_strndup(const char *str, int n)
 	return (ret);
 }
 /**
- * _strcpy - Copy a string.
- * @dest: Destination string where the copy is stored.
- * @src: Source string to be copied.
- *
- * Return: A pointer to the destination string (`dest`).
- */
-char *_strcpy(char *dest, const char *src)
-{
-	char *result = dest;
-
-	while (*src)
-		*dest++ = *src++;
-
-	/* Null-terminate the destination string */
-	*dest = '\0';
-
-	return (result);
-}
-/**
- * _strncpy - Copy a string.
- * @dest: Destination string where the copy is stored.
- * @src: Source string to be copied.
- * @n: Number of bytes to copy.
- *
- * Return: A pointer to the destination string (`dest`).
- */
-char *_strncpy(char *dest, const char *src, int n)
-{
-	char *result = dest;
-	int i = 0;
-
-	while (*src && i < n)
-	{
-		*dest++ = *src++;
-		i++;
-	}
-
-	/* Null-terminate the destination string if there's space left */
-	while (i < n)
-	{
-		*dest++ = '\0';
-		i++;
-	}
-
-	return (result);
-}
-/**
- * _strlen - returns the length of a string
- * @s: the string whose length to check
- *
- * Return: integer length of string
- */
-int _strlen(char *s)
-{
-	int i = 0;
-
-	if (!s)
-		return (0);
-
-	while (*s++)
-		i++;
-	return (i);
-}
-/**
  * _strchr - locates a character ina string
  * @s: string to locate char
  * @c: charater to be located
@@ -135,4 +70,50 @@ char *_strchr(char *s, char c)
 		return (s);
 	}
 	return (NULL);
+}
+/**
+ * _strcmp - performs lexicogarphic comparison of two strangs.
+ * @s1: the first strang
+ * @s2: the second strang
+ *
+ * Return: negative if s1 < s2, positive if s1 > s2, zero if s1 == s2
+ */
+int _strcmp(char *s1, char *s2)
+{
+	while (*s1 && *s2)
+	{
+		if (*s1 != *s2)
+			return (*s1 - *s2);
+		s1++;
+		s2++;
+	}
+	if (*s1 == *s2)
+		return (0);
+	else
+		return (*s1 < *s2 ? -1 : 1);
+}
+/**
+ * _strncmp  - compares two strangs.
+ * @s1: the first strang
+ * @s2: the second strang
+ * @n: the number of bytes to compare
+ *
+ * Return: negative if s1 < s2, positive if s1 > s2, zero if s1 == s2
+ */
+int _strncmp(char *s1, char *s2, int n)
+{
+	int i = 0;
+
+	while (*s1 && *s2 && i < n - 1)
+	{
+		if (*s1 != *s2)
+			return (*s1 - *s2);
+		s1++;
+		s2++;
+		i++;
+	}
+	if (*s1 == *s2)
+		return (0);
+	else
+		return (*s1 < *s2 ? -1 : 1);
 }
