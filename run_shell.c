@@ -38,9 +38,7 @@ int run_shell(t_env **env_list, char *name)
 
 			if (args[i] != NULL && !is_line_empty(args[i]))
 			{
-				info->line = args[i];
-				info->char_len = _strlen(args[i]) + 1;
-				start_process(&info, env_list);
+				handle_logical_operators(args[i], &info, env_list);
 			}
 		}
 	}
@@ -160,7 +158,7 @@ int start_process(info_t **info, t_env **env_list)
 		return (EXIT_FAILURE); /* Ignore empty lines or input errors */
 
 	replace_env_var(info, *env_list);
-	
+
 	if ((*info)->argc == 0)
 		return (EXIT_FAILURE);
 

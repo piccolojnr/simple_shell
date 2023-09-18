@@ -93,7 +93,11 @@ int env_builtin(info_t *info, t_env **env_list)
 
 	while (current)
 	{
-		_printf("%s=%s\n", current->name, current->value);
+		_printf("%s=", current->name);
+		if (current->value != NULL)
+			_printf("%s\n", current->value);
+		else
+			_printf("\n");
 		current = current->next;
 	}
 

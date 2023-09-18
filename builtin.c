@@ -48,7 +48,7 @@ void replace_env_var(info_t **info, t_env *env_list)
 		if ((*info)->argv[i][0] == '$' && (*info)->argv[i][1] != '\0' && (*info)->argv[i][1] != '\n')
 		{
 			env_name = (*info)->argv[i] + 1; /* Skip the '$' symbol */
-			if (_strcmp(env_name, "$"))
+			if (_strcmp(env_name, "$") == 0)
 			{
 				new_arg = int_to_string((int)shell_pid);
 				if (new_arg == NULL)
@@ -59,7 +59,7 @@ void replace_env_var(info_t **info, t_env *env_list)
 				free((*info)->argv[i]);
 				(*info)->argv[i] = new_arg;
 			}
-			else if (_strcmp(env_name, "?"))
+			else if (_strcmp(env_name, "?") == 0)
 			{
 				new_arg = int_to_string((*info)->status);
 				if (new_arg == NULL)
