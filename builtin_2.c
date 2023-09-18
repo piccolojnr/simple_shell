@@ -10,23 +10,24 @@
  */
 int chdir_builtin(info_t *info, t_env **env_list, alias_t **alias_list)
 {
+    char *target_directory;
     (void)alias_list;
 
     if (info->argc != 2)
     {
         _printf("Usage: cd <directory>\n");
-        return 1; /* Return an error code */
+        return (1); /* Return an error code */
     }
 
-    char *target_directory = info->argv[1];
+    target_directory = info->argv[1];
 
-    if (strcmp(target_directory, "-") == 0)
+    if (_strcmp(target_directory, "-") == 0)
     {
-        return handleDash(info, env_list);
+        return (handle_dash(info, env_list));
     }
     else
     {
-        return changeDirectory(target_directory, env_list);
+        return (change_directory(target_directory, env_list));
     }
 }
 /**

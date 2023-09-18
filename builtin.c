@@ -44,19 +44,21 @@ int find_builtin(info_t *info, t_env **env_list, alias_t **alias_list)
 void replace_env_var(info_t **info, t_env *env_list)
 {
     pid_t shell_pid = getpid();
+    int i;
+    char *env_name;
 
-    for (int i = 0; i < (*info)->argc; i++)
+    for (i = 0; i < (*info)->argc; i++)
     {
         if ((*info)->argv[i][0] == '$' && (*info)->argv[i][1] != '\0' && (*info)->argv[i][1] != '\n')
         {
-            char *env_name = (*info)->argv[i] + 1; /* Skip the '$' symbol */
+            env_name = (*info)->argv[i] + 1; /* Skip the '$' symbol */
 
             if (_strcmp(env_name, "$") == 0)
-                replaceWithPid(info, i, shell_pid);
+                replace_with_pid(info, i, shell_pid);
             else if (_strcmp(env_name, "?") == 0)
-                replaceWithStatus(info, i);
+                replace_with_status(info, i);
             else
-                replaceWithEnvVar(info, i, env_name, env_list);
+                replace_with_env_var(info, i, env_name, env_list);
         }
     }
 
@@ -71,6 +73,7 @@ void replace_env_var(info_t **info, t_env *env_list)
 void replace_with_pid(info_t **info, int index, pid_t shell_pid)
 {
     char *new_arg = int_to_string((int)shell_pid);
+
     if (new_arg == NULL)
     {
         perror("int_to_string");
@@ -87,6 +90,7 @@ void replace_with_pid(info_t **info, int index, pid_t shell_pid)
 void replace_with_status(info_t **info, int index)
 {
     char *new_arg = int_to_string((*info)->status);
+
     if (new_arg == NULL)
     {
         perror("int_to_string");

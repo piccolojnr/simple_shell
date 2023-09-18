@@ -14,12 +14,12 @@ int handle_dash(info_t *info, t_env **env_list)
     {
         free(info->argv[1]);
         info->argv[1] = oldpwd;
-        return changeDirectory(info->argv[1], env_list);
+        return (change_directory(info->argv[1], env_list));
     }
     else
     {
         _printf("OLDPWD not set.\n");
-        return 1;
+        return (1);
     }
 }
 /**
@@ -33,13 +33,14 @@ int change_directory(const char *target_directory, t_env **env_list)
 {
     char *pwd = _strdup(target_directory);
     char *oldpwd = _getenv("PWD", *env_list);
+    char *newpwd;
 
     if (oldpwd)
     {
         if (_setenv("OLDPWD", oldpwd, 1, env_list) == 0)
         {
             perror("OLDPWD setting failed");
-            return 1; /* Return an error code */
+            return (1); /* Return an error code */
         }
     }
 
@@ -47,10 +48,10 @@ int change_directory(const char *target_directory, t_env **env_list)
     {
         free(pwd);
         perror("chdir");
-        return 1; /* Return an error code */
+        return (1); /* Return an error code */
     }
 
-    char *newpwd = getcwd(NULL, 0);
+    newpwd = getcwd(NULL, 0);
 
     if (newpwd)
     {
@@ -59,7 +60,7 @@ int change_directory(const char *target_directory, t_env **env_list)
             perror("PWD");
             free(pwd);
             free(newpwd);
-            return 1; /* Return an error code */
+            return (1); /* Return an error code */
         }
         free(newpwd);
     }
@@ -67,9 +68,9 @@ int change_directory(const char *target_directory, t_env **env_list)
     {
         free(pwd);
         perror("getcwd");
-        return 1;
+        return (1);
     }
 
     free(pwd);
-    return 0; /* Return success */
+    return (0); /* Return success */
 }
