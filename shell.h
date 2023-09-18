@@ -89,7 +89,7 @@ int handle_logical_operators(char *line, info_t **info,
 
 /* _getline */
 int _getline(char **, size_t *, int);
-void get_input(info_t *, char **, size_t *, int);
+char **_fgets(info_t *, char **, size_t *, int);
 void *_realloc(void *, unsigned int);
 void *_malloc(unsigned int);
 void *_realloc2(void *ptr, unsigned int old_size, unsigned int new_size);

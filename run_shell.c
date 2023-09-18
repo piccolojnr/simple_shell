@@ -18,7 +18,18 @@ int run_shell(t_env **env_list, char *name)
 	while (shell_status)
 	{
 		_printf("piccolojnr@:~$ ");
-		get_input(info, &line, &char_len, fileno(stdin));
+		if (_fgets(info, &line, &char_len, fileno(stdin)) == NULL)
+		{
+			perror("\n");
+			free(info);
+			break;
+		}
+		_printf("%s\n", line);
+		if (char_len == (size_t)-1)
+		{
+            _printf("\n"); 
+            break;
+        }
 
 		if (is_line_empty(line))
 			continue;

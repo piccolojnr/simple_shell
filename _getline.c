@@ -1,12 +1,12 @@
 #include "shell.h"
 /**
- * get_input - get input from user
+ * _fgets - get input from user
  * @info: struct with variables
  * @buffer: buffer with commands
  * @characters: number of characters
  * @fd: file descriptor
  */
-void get_input(info_t *info, char **buffer, size_t *characters, int fd)
+char **_fgets(info_t *info, char **buffer, size_t *characters, int fd)
 {
     int bufsize;
 
@@ -14,12 +14,11 @@ void get_input(info_t *info, char **buffer, size_t *characters, int fd)
 
     if (bufsize == -1)
     {
-
-        /* Error reading input */
-        perror("Error reading input");
-        free(buffer);
+        _printf("\n");
         exit_shell(info, EXIT_FAILURE);
+        return (NULL);
     }
+    return (buffer);
 }
 /**
  * _realloc - reallocate a buffer
