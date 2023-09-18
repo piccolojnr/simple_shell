@@ -23,6 +23,33 @@ char *_strdup(const char *str)
 	return (ret);
 }
 /**
+ * _strndup - duplicates a string
+ * @str: the string to duplicate
+ * @n: number of bytes to duplicate
+ *
+ * Return: pointer to the duplicated string
+ */
+char *_strndup(const char *str, int n)
+{
+	int i;
+	char *ret;
+
+	if (str == NULL || n < 0)
+		return (NULL);
+
+	ret = malloc(sizeof(char) * (n + 1));
+
+	if (!ret)
+		return (NULL);
+
+	for (i = 0; i < n && str[i] != '\0'; i++)
+		ret[i] = str[i];
+
+	ret[n] = '\0';
+
+	return (ret);
+}
+/**
  * _strcpy - Copy a string.
  * @dest: Destination string where the copy is stored.
  * @src: Source string to be copied.

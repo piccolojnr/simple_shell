@@ -1,78 +1,21 @@
 #include "shell.h"
 /**
- * _getline - get a line from stdin
- * @lineptr: pointer to buffer
- * @n: size of the buffer
- * @stream: stream
- *
- * Return: number of bytes read
- */
-ssize_t _getline(char **lineptr, size_t *n, FILE *stream)
-{
-    char *buf, c;
-    ssize_t ret;
-    static size_t char_length;
-    int r;
-
-    char_length = 0;
-    if (lineptr == NULL || n == NULL || stream == NULL)
-        return (-1);
-    if (*n == 0)
-        *n = BUFFER_SIZE;
-    buf = malloc(sizeof(char) * BUFFER_SIZE);
-    if (!buf)
-        return (-1);
-    while ((r = read(fileno(stream), &c, 1)) == 1 && c != '\n')
-    {
-        if (char_length >= *n)
-        {
-            *n *= 2;
-            buf = _realloc(buf, *n / 2, *n);
-            if (!buf)
-            {
-                free(buf);
-                return (-1);
-            }
-        }
-        buf[char_length++] = c;
-    }
-    if (r == -1 || (r == 0 && char_length == 0))
-    {
-        free(buf);
-        return (-1);
-    }
-    buf[char_length] = '\0';
-    if (*lineptr)
-        free(*lineptr);
-    *lineptr = buf;
-    ret = char_length;
-    return (ret);
-}
-/**
  * get_input - get input from user
  * @info: struct with variables
  */
-void get_input(info_t *info)
+void get_input(info_t *info, char **buffer, size_t *characters, int fd)
 {
-    info->char_len = getline(&info->line, &info->line_len, stdin);
+    int bufsize;
 
-    if ((info->char_len == -1))
+    bufsize = _getline(buffer, characters, fd);
+
+    if (bufsize == -1)
     {
-        if (feof(stdin))
-        {
-            /* EOF reached, exit gracefully */
-            free(info->line);
-            free(info);
-            exit_shell(info, EXIT_SUCCESS); /* or any other appropriate action */
-        }
-        else
-        {
-            /* Error reading input */
-            perror("Error reading input");
-            free(info->line);
-            free(info);
-            exit_shell(info, EXIT_FAILURE);
-        }
+
+        /* Error reading input */
+        perror("Error reading input");
+        free(buffer);
+        exit_shell(info, EXIT_FAILURE);
     }
 }
 /**
@@ -83,7 +26,42 @@ void get_input(info_t *info)
  *
  * Return: pointer to the buffer
  */
-void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size)
+void *_realloc(void *ptr, unsigned int size)
+{
+    char *p, *copy;
+    void *ret;
+    int i;
+
+    p = (char *)_malloc(size);
+    copy = (char *)ptr;
+    ret = NULL;
+
+    if (!p)
+    {
+        ret = p;
+        return (ret);
+    }
+
+    i = 0;
+    while (copy[i])
+    {
+        p[i] = copy[i];
+        i++;
+    }
+    p[i] = '\0';
+    ret = (void *)p;
+    free(ptr);
+    return (ret);
+}
+/**
+ * _realloc2 - reallocate a buffer
+ * @ptr: pointer to the buffer
+ * @new_size: new size of the buffer
+ * @old_size: old size of the buffer
+ *
+ * Return: pointer to the buffer
+ */
+void *_realloc2(void *ptr, unsigned int old_size, unsigned int new_size)
 {
     void *mem;
     char *ptr_copy, *filler;
@@ -118,4 +96,69 @@ void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size)
         filler[index] = *ptr_copy++;
 
     return (mem);
+}
+void *_malloc(unsigned int size)
+{
+    char *ptr = malloc(size);
+    void *_ptr = NULL;
+    unsigned int i = 0;
+
+    if (!ptr)
+    {
+        _printf("ERROR ALLOCATING MEMORY");
+        exit(EXIT_FAILURE);
+    }
+    while (i < size)
+    {
+        ptr[i] = '\0';
+        i++;
+    }
+    _ptr = (void *)ptr;
+    return (_ptr);
+}
+/**
+ * _getline - get line of string from file
+ * @lnptr: variable to store string
+ * @size: number of strings stored
+ * @fd: file to read from
+ *
+ * Return: the lenghh of lnptr or -1 on failure
+ */
+
+int _getline(char **lnptr, size_t *size, int fd)
+{
+    char buffer[BUFFER_SIZE + 1];
+    int r = BUFFER_SIZE, len = 0, mode = isatty(0);
+    char *tmp;
+
+    *lnptr = (char *)_malloc(4);
+    **lnptr = '\0';
+    while (r == BUFFER_SIZE)
+    {
+        if (*lnptr && len > 0)
+            if ((*lnptr)[len - 1] == '\n' && mode)
+                break;
+        r = read(fd, buffer, BUFFER_SIZE);
+        if (r < 0 && errno == EINTR)
+        {
+            **lnptr = '\n', *(*lnptr + 1) = '\n', len = 2;
+            return (len);
+        }
+        if (r < 0)
+            exit(-1);
+        if (r == 0 && mode)
+            return (-1);
+        tmp = _realloc(*lnptr, len + r + 4);
+        *size = len + r + 4, *lnptr = tmp;
+        buffer[r] = '\0', _strcat(*lnptr, buffer), len += r;
+        if (!mode)
+            replace_str(lnptr, "\n", ";");
+    }
+    if (!mode)
+    {
+        tmp = _realloc(*lnptr, _strlen(*lnptr) + 3);
+        *lnptr = tmp;
+        (*lnptr)[len] = '\n', (*lnptr)[len + 1] = '\0';
+    }
+    return (len);
 }

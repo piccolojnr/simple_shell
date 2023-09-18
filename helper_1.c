@@ -102,3 +102,116 @@ char *concat_path_and_cmd(const char *path, const char *cmd)
 
     return result;
 }
+/**
+ * is_line_empty - Checks if a line is empty.
+ * @line: The line to check.
+ * Return: 1 if the line is empty, otherwise 0.
+ */
+int is_line_empty(const char *line)
+{
+    if (line == NULL || line[0] == '\0' || line[0] == ' ' || line[0] == '\t' || line[0] == '\n')
+        return (1);
+    else
+        return (0);
+}
+/**
+ * isspace - Checks if a character is a space.
+ * @c: The character to check.
+ *
+ * Return: 1 if the character is a space, otherwise 0.
+ */
+int isspace(int c)
+{
+    return (c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r' || c == '\0');
+}
+#include <stdio.h>
+#include <stdbool.h>
+/**
+ * count_digits - Counts the number of digits in an integer.
+ * @num: The integer to count.
+ *
+ * Return: The number of digits in the integer.
+ */
+int count_digits(int num)
+{
+    int count = 0;
+
+    while (num != 0)
+    {
+        num /= 10;
+        count++;
+    }
+    return count;
+}
+/**
+ * int_to_string - Converts an integer to a string.
+ * @num: The integer to convert.
+ *
+ * Return: The converted string.
+ */
+char *int_to_string(int num)
+{
+    int i, j, is_negative = 0, num_digits = 0;
+    char *str;
+
+    /*Handle the case of a negative number*/
+    if (num < 0)
+    {
+        is_negative = 1;
+        num = -num;
+        num_digits++;
+    }
+
+    /*Calculate the number of digits*/
+    num_digits += count_digits(num);
+
+    /*Allocate memory for the string*/
+    str = (char *)malloc(sizeof(char) * (num_digits + 1));
+    if (str == NULL)
+        return (NULL);
+
+    /*Handle the case of 0 separately*/
+    if (num == 0)
+    {
+        str[0] = '0';
+        str[1] = '\0';
+        return (str);
+    }
+
+    /*Convert each digit to a character and store it in the string*/
+    for (i = num_digits - 1; i >= 0; i--)
+    {
+        str[i] = (num % 10) + '0';
+        num /= 10;
+    }
+
+    /*Null-terminate the string*/
+    str[num_digits] = '\0';
+
+    /*Add a negative sign if the original number was negative*/
+    if (is_negative)
+    {
+        for (j = num_digits; j >= 0; j--)
+        {
+            str[j + 1] = str[j];
+        }
+        str[0] = '-';
+    }
+    return (str);
+}
+/**
+ * execute_logical_command - Executes a logical command.
+ * @info: A pointer to the info structure.
+ * @and_operator: The operator of the logical command.
+ *
+ * Return: The exit status of the logical command.
+ */
+int execute_logical_command(info_t **info, t_env **env_list, int and_operator)
+{
+    int exit_status = start_process(info, env_list);
+
+    if ((and_operator && exit_status == 0) || (!and_operator && exit_status != 0))
+        return (1);
+    else
+        return (0);
+}

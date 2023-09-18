@@ -17,6 +17,7 @@ int find_builtin(info_t *info, t_env **env_list)
 		{"env", env_builtin},
 		{"setenv", setenv_builtin},
 		{"unsetenv", unsetenv_builtin},
+		{"cd", chdir_builtin},
 		{NULL, NULL}};
 
 	/* find built-in command */
@@ -40,30 +41,56 @@ void replace_env_var(info_t **info, t_env *env_list)
 {
 	int i;
 	char *env_name, *env_value, *new_arg;
+	pid_t shell_pid = getpid();
 
 	for (i = 0; i < (*info)->argc; i++)
 	{
 		if ((*info)->argv[i][0] == '$' && (*info)->argv[i][1] != '\0' && (*info)->argv[i][1] != '\n')
 		{
 			env_name = (*info)->argv[i] + 1; /* Skip the '$' symbol */
-			env_value = _getenv(env_name, env_list);
-
-			if (env_value)
+			if (_strcmp(env_name, "$"))
 			{
-				new_arg = _strdup(env_value);
-				if (!new_arg)
+				new_arg = int_to_string((int)shell_pid);
+				if (new_arg == NULL)
 				{
-					perror("strdup");
-					exit(EXIT_FAILURE); /* Handle memory allocation failure */
+					perror("int_to_string");
+					exit_shell(*info, EXIT_FAILURE);
 				}
-				free((*info)->argv[i]);		/* Free the old argument */
-				(*info)->argv[i] = new_arg; /* Assign the new argument */
+				free((*info)->argv[i]);
+				(*info)->argv[i] = new_arg;
+			}
+			else if (_strcmp(env_name, "?"))
+			{
+				new_arg = int_to_string((*info)->status);
+				if (new_arg == NULL)
+				{
+					perror("int_to_string");
+					exit_shell(*info, EXIT_FAILURE);
+				}
+				free((*info)->argv[i]);
+				(*info)->argv[i] = new_arg;
 			}
 			else
 			{
-				/* Environment variable not found, set the argument to NULL */
-				free((*info)->argv[i]); /* Free the old argument */
-				(*info)->argv[i] = NULL;
+				env_value = _getenv(env_name, env_list);
+
+				if (env_value)
+				{
+					new_arg = _strdup(env_value);
+					if (!new_arg)
+					{
+						perror("strdup");
+						exit_shell(*info, EXIT_FAILURE); /* Handle memory allocation failure */
+					}
+					free((*info)->argv[i]);		/* Free the old argument */
+					(*info)->argv[i] = new_arg; /* Assign the new argument */
+				}
+				else
+				{
+					/* Environment variable not found, set the argument to NULL */
+					free((*info)->argv[i]); /* Free the old argument */
+					(*info)->argv[i] = NULL;
+				}
 			}
 		}
 	}

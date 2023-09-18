@@ -2,6 +2,7 @@
 /**
  * which_builtin - looks for files in the current path
  * @info: the parameter struct
+ * @env_list: env var linked list
  *
  * Return: 1 if found, 0 if not
  */
@@ -47,6 +48,7 @@ int which_builtin(info_t *info, t_env **env_list)
 /**
  * exit_builtin - exits the shell
  * @info: the parameter struct
+ * @env_list: env var linked list
  *
  * Return: 0 on success, 1 on failure
  */
@@ -76,6 +78,7 @@ int exit_builtin(info_t *info, t_env **env_list)
 /**
  * env_builtin - prints the current environment
  * @info: the parameter struct
+ * @env_list: env var linked list
  *
  * Return: 0 on success, 1 on failure
  */
@@ -99,6 +102,7 @@ int env_builtin(info_t *info, t_env **env_list)
 /**
  * setenv_builtin - sets an environment variable
  * @info: the parameter struct
+ * @env_list: env var linked list
  *
  * Return: 0 on success, 1 on failure
  */
@@ -121,6 +125,7 @@ int setenv_builtin(info_t *info, t_env **env_list)
 /**
  * unsetenv_builtin - deletes an environment variable
  * @info: the parameter struct
+ * @env_list: env var linked list
  *
  * Return: 0 on success, 1 on failure
  */

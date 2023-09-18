@@ -27,8 +27,7 @@ int split_str(char *str, char ***args, char *delim)
 	while (token)
 	{
 		word_count++;
-		temp = _realloc(temp, sizeof(char *) *
-			(word_count - 1), sizeof(char *) * (word_count + 1));
+		temp = _realloc2(temp, sizeof(char *) * (word_count - 1), sizeof(char *) * (word_count + 1));
 		if (!temp)
 		{
 			perror("Memory allocation failed");
