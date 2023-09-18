@@ -2,16 +2,17 @@
 /**
  * create_env_list - creates a linked list of environment variables
  * @env_list: pointer to a pointer to the head of the list
+ * @environ: pointer to the environment variables
  *
  * Return: 1 on success, 0 on failure
  */
-int create_env_list(t_env **env_list)
+int create_env_list(t_env **env_list, char **env)
 {
 	int i;
 	t_env *head = NULL;
 	char *name, *value, **args;
 
-	if (environ == NULL)
+	if (env == NULL)
 		return (0);
 
 	if (env_list != NULL)
@@ -19,9 +20,9 @@ int create_env_list(t_env **env_list)
 		free_env_list(*env_list);
 	}
 
-	for (i = 0; environ[i]; i++)
+	for (i = 0; env[i]; i++)
 	{
-		args = split_env(environ[i]);
+		args = split_env(env[i]);
 		if (!args)
 			continue;
 

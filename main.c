@@ -7,12 +7,12 @@
  *
  * Return: 0
  */
-int main(int argc, char **argv)
+int main(int argc, char **argv, char **env)
 {
 	t_env *env_list;
 	(void)argc;
 
-	if (!create_env_list(&env_list))
+	if (!create_env_list(&env_list, env))
 	{
 		perror("main");
 		exit(EXIT_FAILURE);

@@ -166,7 +166,7 @@ int execute_logical_command(info_t **info,
 		t_env **env_list, alias_t **, int and_operator);
 
 /* env_lists */
-int create_env_list(t_env **);
+int create_env_list(t_env **, char **);
 int add_env_node_end(const char *, const char *, t_env **);
 void free_env_list(t_env *);
 int edit_env_node(char *, char *, t_env **);

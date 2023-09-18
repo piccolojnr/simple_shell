@@ -24,7 +24,6 @@ int run_shell(t_env **env_list, char *name)
 			free(info);
 			break;
 		}
-		_printf("%s\n", line);
 		if (char_len == (size_t)-1)
 		{
             _printf("\n"); 
