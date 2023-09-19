@@ -15,7 +15,7 @@ int run_shell_interactive(t_env **env_list, alias_t **alias_list)
 
 	while (shell_status)
 	{
-		_printf("piccolojnr@:~$ ");
+		_printf("$ ");
 		if (_fgets(info, &line, &char_len, stdin) == NULL)
 		{
 			perror("\n");
