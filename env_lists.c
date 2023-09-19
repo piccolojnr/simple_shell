@@ -1,30 +1,29 @@
 #include "shell.h"
 /**
  * create_env_list - creates a linked list of environment variables
- * @env_list: pointer to a pointer to the head of the list
- * @env: pointer to the environment variables
+ * @info: ...
  *
  * Return: 1 on success, 0 on failure
  */
-int create_env_list(t_env **env_list, char **env)
+int create_env_list(info_t **info)
 {
 	int i;
 	t_env *head = NULL;
 	char *name, *value, **args;
 
-	if (env == NULL)
+	if (environ == NULL)
 		return (0);
 
-	for (i = 0; env[i]; i++)
+	for (i = 0; environ[i]; i++)
 	{
-		args = split_env(env[i]);
+		args = split_env(environ[i]);
 		if (!args)
 			continue;
 
 		name = args[0];
 		value = args[1];
 
-		if (!add_env_node_end(name, value, env_list))
+		if (!add_env_node_end(name, value, &(*info)->env))
 		{
 			free_env_list(head);
 			return (0);

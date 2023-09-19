@@ -3,55 +3,49 @@
 /**
  * chdir_builtin - Change the current working directory.
  * @info: Pointer to the info_t struct containing command info.
- * @env_list: Pointer to the environment variable linked list (not used here).
- * @alias_list: Pointer to the alias linked list (not used here).
  *
  * Return: 0 on success, 1 on failure.
  */
-int chdir_builtin(info_t *info, t_env **env_list, alias_t **alias_list)
+int chdir_builtin(info_t **info)
 {
 char *target_directory;
-(void)alias_list;
-if (info->argc != 2)
+if ((*info)->argc != 2)
 {
 _printf("Usage: cd <directory>\n");
 return (1); /* Return an error code */
 }
-target_directory = info->argv[1];
+target_directory = (*info)->argv[1];
 if (_strcmp(target_directory, "-") == 0)
 {
-return (handle_dash(info, env_list));
+return (handle_dash(*info, &(*info)->env));
 }
 else
 {
-return (change_directory(target_directory, env_list));
+return (change_directory(target_directory, &(*info)->env));
 }
 }
 /**
  * alias_builtin - Define or display aliases.
  * @info: Pointer to the info_t struct containing command info.
- * @env_list: Pointer to the environment variable linked list (not used here).
- * @alias_list: Pointer to the alias linked list.
  *
  * Return: 0 on success, 1 on failure.
  */
-int alias_builtin(info_t *info, t_env **env_list, alias_t **alias_list)
+int alias_builtin(info_t **info)
 {
 int i, num;
-(void)env_list;
-if (info->argc == 1)
+if ((*info)->argc == 1)
 {
-print_aliases(*alias_list);
+print_aliases((*info)->aliases);
 }
-else if (info->argc > 1)
+else if ((*info)->argc > 1)
 {
-for (i = 1; i < info->argc; i++)
+for (i = 1; i < (*info)->argc; i++)
 {
-num = find_num_sub(info->argv[i], "=");
+num = find_num_sub((*info)->argv[i], "=");
 if (num == 1)
-define_alias(info, i, alias_list);
+define_alias(*info, i, &(*info)->aliases);
 else if (num == 0)
-print_specific_alias(*alias_list, info->argv[i]);
+print_specific_alias((*info)->aliases, (*info)->argv[i]);
 else
 {
 perror("alias");
@@ -92,4 +86,22 @@ new_argv[j] = NULL;
 free((*info)->argv);
 (*info)->argv = new_argv;
 (*info)->argc = new_argc;
+}
+/**
+ * custom_fgets - Reads from a file stream.
+ * @str: String to read from.
+ * @size: Size of string.
+ * @stream: File stream.
+ *
+ * Return: String read from stream.
+ */
+char *custom_fgets(char *str, int size, FILE *stream)
+{
+int bytesRead = read(fileno(stream), str, size);
+if (bytesRead == -1)
+{
+return (NULL);
+}
+str[bytesRead] = '\0';
+return (str);
 }

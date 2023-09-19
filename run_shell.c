@@ -1,43 +1,39 @@
 #include "shell.h"
 /**
  * run_shell_interactive - Runs the shell
- * @env_list: ...
- * @alias_list: ...
+ * @info: A pointer to a info_t struct
  *
  * Return: 0 for success, 1 for failure
  */
-int run_shell_interactive(t_env **env_list, alias_t **alias_list)
+int run_shell_interactive(info_t **info)
 {
 	int shell_status = 1;
-	info_t *info = malloc(sizeof(info_t));
 	char *line;
 	size_t char_len = 0;
 
 	while (shell_status)
 	{
 		_printf("$ ");
-		if (_fgets(info, &line, &char_len, stdin) == NULL)
+		if (_fgets(*info, &line, &char_len, stdin) == NULL)
 		{
 			perror("\n");
-			free(info);
+			free(*info);
 			break;
 		}
-		run_shell(&info, env_list, alias_list, line);
+		run_shell(info, line);
+		free(line);
 	}
-	exit_shell(info, EXIT_SUCCESS);
+	exit_shell(*info, EXIT_SUCCESS);
 	return (0);
 }
 /**
  * handle_logical_operators - Handles logical operators
  * @line: The logical operator string
  * @info: A pointer to a info_t struct
- * @env_list: A pointer to a env_t struct
- * @alias_list: A pointer to a alias_t struct
  *
  * Return: 1 on success, 0 on failure
  */
-int handle_logical_operators(char *line, info_t **info,
-							 t_env **env_list, alias_t **alias_list)
+int handle_logical_operators(char *line, info_t **info)
 {
 	int success = EXIT_SUCCESS, is_and_operator, len, start = 0, end = 0;
 	char *tmp;
@@ -55,7 +51,7 @@ int handle_logical_operators(char *line, info_t **info,
 			tmp = _strndup(line + start, len);
 			(*info)->line = tmp;
 			(*info)->char_len = _strlen(tmp) + 1;
-			if (!execute_logical_command(info, env_list, alias_list, is_and_operator))
+			if (!execute_logical_command(info, is_and_operator))
 			{
 				success = EXIT_FAILURE;
 				free(tmp);
@@ -70,7 +66,7 @@ int handle_logical_operators(char *line, info_t **info,
 	tmp = _strndup(line + start, len);
 	(*info)->line = tmp;
 	(*info)->char_len = _strlen(tmp) + 1;
-	if (!execute_logical_command(info, env_list, alias_list, is_and_operator))
+	if (!execute_logical_command(info, is_and_operator))
 	{
 		success = EXIT_FAILURE;
 		free(tmp);
@@ -122,12 +118,10 @@ char *filter_comments(const char *line)
 /**
  * start_process - Starts a process
  * @info: A pointer to a info_t struct
- * @env_list: A pointer to a env_t struct
- * @alias_list: A pointer to a alias_t struct
  *
  * Return: The exit status of the process
  */
-int start_process(info_t **info, t_env **env_list, alias_t **alias_list)
+int start_process(info_t **info)
 {
 	int exit_status;
 	/* Remove newline */
@@ -139,13 +133,13 @@ int start_process(info_t **info, t_env **env_list, alias_t **alias_list)
 	if ((*info)->argv == NULL || (*info)->argc == 0)
 		return (EXIT_FAILURE); /* Ignore empty lines or input errors */
 
-	replace_env_var(info, *env_list);
+	replace_env_var(info);
 
 	if ((*info)->argc == 0)
 		return (EXIT_FAILURE);
 
 	/* Check if the command exists in the PATH and execute it */
-	find_executable(info, env_list, alias_list);
+	find_executable(info);
 	if ((*info)->path != NULL && (*info)->is_built_in == -1)
 	{
 		exit_status = execute_command(info);
@@ -164,10 +158,8 @@ int start_process(info_t **info, t_env **env_list, alias_t **alias_list)
 /**
  * find_executable - Finds an executable in the PATH
  * @info: A pointer to a info_t struct
- * @env_list: A pointer to a env_t struct
- * @alias_list: A pointer to a alias_t struct
  */
-void find_executable(info_t **info, t_env **env_list, alias_t **alias_list)
+void find_executable(info_t **info)
 {
 	int i, path_len;
 	char *path;
@@ -175,7 +167,7 @@ void find_executable(info_t **info, t_env **env_list, alias_t **alias_list)
 	char *path_with_cmd;
 
 	/* check for built ins */
-	(*info)->is_built_in = find_builtin(*info, env_list, alias_list);
+	(*info)->is_built_in = find_builtin(info);
 	if ((*info)->is_built_in != -1)
 		return;
 	if (is_path((*info)->argv[0]))
@@ -183,7 +175,7 @@ void find_executable(info_t **info, t_env **env_list, alias_t **alias_list)
 		(*info)->path = (*info)->argv[0];
 		return;
 	}
-	path = _getenv("PATH", *env_list);
+	path = _getenv("PATH", (*info)->env);
 	if (path == NULL || (*info)->argv[0] == NULL)
 		return;
 	path_len = split_str(path, &path_buffer, ":");
@@ -192,7 +184,7 @@ void find_executable(info_t **info, t_env **env_list, alias_t **alias_list)
 	for (i = 0; i < path_len; i++)
 	{
 		path_with_cmd = (char *)malloc(strlen(path_buffer[i])
-			+ strlen((*info)->argv[0]) + 2);
+		+ strlen((*info)->argv[0]) + 2);
 		if (path_with_cmd == NULL)
 		{
 			perror("Memory allocation error");

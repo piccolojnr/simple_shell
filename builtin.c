@@ -2,15 +2,13 @@
 /**
  * find_builtin - finds a builtin command
  * @info: the parameter & return info struct
- * @env_list: ...
- * @alias_list: ...
  *
  * Return: -1 if builtin not found,
  *			0 if builtin executed successfully,
  *			1 if builtin found but not successful,
  *			-2 if builtin signals exit()
  */
-int find_builtin(info_t *info, t_env **env_list, alias_t **alias_list)
+int find_builtin(info_t **info)
 {
 int i, built_in_ret = -1;
 builtin_table builtintbl[] = {
@@ -25,9 +23,9 @@ builtin_table builtintbl[] = {
 /* find built-in command */
 for (i = 0; builtintbl[i].type; i++)
 {
-if (info->argv[0] && _strcmp(info->argv[0], builtintbl[i].type) == 0)
+if ((*info)->argv[0] && _strcmp((*info)->argv[0], builtintbl[i].type) == 0)
 {
-built_in_ret = builtintbl[i].func(info, env_list, alias_list);
+built_in_ret = builtintbl[i].func(info);
 break;
 }
 }
