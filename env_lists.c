@@ -15,11 +15,6 @@ int create_env_list(t_env **env_list, char **env)
 	if (env == NULL)
 		return (0);
 
-	if (env_list != NULL)
-	{
-		free_env_list(*env_list);
-	}
-
 	for (i = 0; env[i]; i++)
 	{
 		args = split_env(env[i]);
