@@ -8,11 +8,14 @@
  */
 int run_shell_non_interactive(t_env **env_list, alias_t **alias_list, char *name)
 {
-    char *line;
+    int i;
+    char *line, **args;
     info_t *info = malloc(sizeof(info_t));
     size_t char_len = 0;
     FILE *file = NULL;
 
+(void)alias_list;
+(void)env_list;
     file = fopen(name, "r");
     if (file == NULL)
     {
@@ -23,8 +26,17 @@ int run_shell_non_interactive(t_env **env_list, alias_t **alias_list, char *name
 
     while (_fgets(info, &line, &char_len, file) != NULL)
     {
-        run_shell(&info, env_list, alias_list, line);
+        split_str(line, &args, "\n");
+        if (args != NULL)
+        {
+            for (i = 0; args[i] != NULL; i++)
+            {
+                run_shell(&info, env_list, alias_list, args[i]);
+            }
+            free_args(args);
+        }
     }
+
     free(line);
     free(info);
     fclose(file);
@@ -62,6 +74,7 @@ int run_shell(info_t **info, t_env **env_list, alias_t **alias_list, char *line)
 
         if (args[i] != NULL && !is_line_empty(args[i]))
         {
+
             handle_logical_operators(args[i], info, env_list, alias_list);
         }
     }
