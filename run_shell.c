@@ -191,15 +191,14 @@ void find_executable(info_t **info, t_env **env_list, alias_t **alias_list)
 		exit_shell(*info, EXIT_FAILURE);
 	for (i = 0; i < path_len; i++)
 	{
-		path_with_cmd = (char *)malloc(strlen(path_buffer[i]) + strlen((*info)->argv[0]) + 2);
+		path_with_cmd = (char *)malloc(strlen(path_buffer[i])
+			+ strlen((*info)->argv[0]) + 2);
 		if (path_with_cmd == NULL)
 		{
 			perror("Memory allocation error");
 			exit_shell(*info, EXIT_FAILURE);
 		}
-
 		path_with_cmd = concat_path_and_cmd(path_buffer[i], (*info)->argv[0]);
-
 		if (access(path_with_cmd, X_OK) == 0)
 		{
 			free_args(path_buffer); /* Clean up the path_buffer */
@@ -208,5 +207,4 @@ void find_executable(info_t **info, t_env **env_list, alias_t **alias_list)
 		}
 		free(path_with_cmd);
 	}
-	return; /* Command not found in any PATH directory */
 }
