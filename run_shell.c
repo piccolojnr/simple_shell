@@ -37,7 +37,7 @@ int run_shell_interactive(t_env **env_list, alias_t **alias_list)
  * Return: 1 on success, 0 on failure
  */
 int handle_logical_operators(char *line, info_t **info,
-					t_env **env_list, alias_t **alias_list)
+							 t_env **env_list, alias_t **alias_list)
 {
 	int success = EXIT_SUCCESS, is_and_operator, len, start = 0, end = 0;
 	char *tmp;
@@ -45,7 +45,7 @@ int handle_logical_operators(char *line, info_t **info,
 	while (line[end] != '\0')
 	{
 		if ((line[end] == '&' && line[end + 1] == '&') ||
-						(line[end] == '|' && line[end + 1] == '|'))
+			(line[end] == '|' && line[end + 1] == '|'))
 		{
 			if (line[end + 1] == '&')
 				is_and_operator = 1;
@@ -178,18 +178,20 @@ void find_executable(info_t **info, t_env **env_list, alias_t **alias_list)
 	(*info)->is_built_in = find_builtin(*info, env_list, alias_list);
 	if ((*info)->is_built_in != -1)
 		return;
+	if (is_path((*info)->argv[0]))
+	{
+		(*info)->path = (*info)->argv[0];
+		return;
+	}
 	path = _getenv("PATH", *env_list);
 	if (path == NULL || (*info)->argv[0] == NULL)
 		return;
-
 	path_len = split_str(path, &path_buffer, ":");
 	if (path_len == -1)
 		exit_shell(*info, EXIT_FAILURE);
-
 	for (i = 0; i < path_len; i++)
 	{
-		path_with_cmd = (char *)malloc(strlen(path_buffer[i])
-					+ strlen((*info)->argv[0]) + 2);
+		path_with_cmd = (char *)malloc(strlen(path_buffer[i]) + strlen((*info)->argv[0]) + 2);
 		if (path_with_cmd == NULL)
 		{
 			perror("Memory allocation error");

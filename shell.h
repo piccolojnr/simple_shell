@@ -165,6 +165,7 @@ char *int_to_string(int);
 int count_digits(int);
 int execute_logical_command(info_t **,
 							t_env **, alias_t **, int);
+int is_path(const char *str);
 
 /* env_lists */
 int create_env_list(t_env **, char **);
