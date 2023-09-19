@@ -10,25 +10,22 @@
  */
 int chdir_builtin(info_t *info, t_env **env_list, alias_t **alias_list)
 {
-    char *target_directory;
-    (void)alias_list;
-
-    if (info->argc != 2)
-    {
-        _printf("Usage: cd <directory>\n");
-        return (1); /* Return an error code */
-    }
-
-    target_directory = info->argv[1];
-
-    if (_strcmp(target_directory, "-") == 0)
-    {
-        return (handle_dash(info, env_list));
-    }
-    else
-    {
-        return (change_directory(target_directory, env_list));
-    }
+char *target_directory;
+(void)alias_list;
+if (info->argc != 2)
+{
+_printf("Usage: cd <directory>\n");
+return (1); /* Return an error code */
+}
+target_directory = info->argv[1];
+if (_strcmp(target_directory, "-") == 0)
+{
+return (handle_dash(info, env_list));
+}
+else
+{
+return (change_directory(target_directory, env_list));
+}
 }
 /**
  * alias_builtin - Define or display aliases.
@@ -40,31 +37,59 @@ int chdir_builtin(info_t *info, t_env **env_list, alias_t **alias_list)
  */
 int alias_builtin(info_t *info, t_env **env_list, alias_t **alias_list)
 {
-    int i, num;
-
-    (void)env_list;
-
-    if (info->argc == 1)
-    {
-        print_aliases(*alias_list);
-    }
-    else if (info->argc > 1)
-    {
-        for (i = 1; i < info->argc; i++)
-        {
-            num = find_num_sub(info->argv[i], "=");
-
-            if (num == 1)
-                define_alias(info, i, alias_list);
-            else if (num == 0)
-                print_specific_alias(*alias_list, info->argv[i]);
-            else
-            {
-                perror("alias");
-                return (1);
-            }
-        }
-    }
-
-    return (0);
+int i, num;
+(void)env_list;
+if (info->argc == 1)
+{
+print_aliases(*alias_list);
+}
+else if (info->argc > 1)
+{
+for (i = 1; i < info->argc; i++)
+{
+num = find_num_sub(info->argv[i], "=");
+if (num == 1)
+define_alias(info, i, alias_list);
+else if (num == 0)
+print_specific_alias(*alias_list, info->argv[i]);
+else
+{
+perror("alias");
+return (1);
+}
+}
+}
+return (0);
+}
+/**
+ * replace_args - Replaces $n references in argv with their
+ * @info: Pointer to the info_t structure
+ */
+void replace_args(info_t **info)
+{
+int i, j, k, new_argc = 0;
+char **new_argv;
+for (i = 0; i < (*info)->argc; i++)
+{
+if ((*info)->argv[i])
+new_argc++;
+}
+new_argv = malloc(sizeof(char *) * new_argc);
+if (!new_argv)
+{
+perror("Memory allocation failed");
+exit(EXIT_FAILURE);
+}
+for (j = 0, k = 0; k < (*info)->argc; k++)
+{
+if ((*info)->argv[k])
+{
+new_argv[j++] = (*info)->argv[k];
+}
+}
+/* Free the old argv array */
+new_argv[j] = NULL;
+free((*info)->argv);
+(*info)->argv = new_argv;
+(*info)->argc = new_argc;
 }

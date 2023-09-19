@@ -24,24 +24,15 @@ int run_shell(t_env **env_list, char *name)
 			free(info);
 			break;
 		}
-		if (char_len == (size_t)-1)
-		{
-            _printf("\n"); 
-            break;
-        }
-
 		if (is_line_empty(line))
 			continue;
-
 		filtered_line = filter_comments(line);
 		if (filtered_line == NULL)
 			continue;
 		free(line);
-
 		split_str(filtered_line, &args, delim);
 		if (args == NULL)
 			continue;
-
 		for (i = 0; args[i] != NULL; i++)
 		{
 			trimmed = trimWhitespace(args[i]);

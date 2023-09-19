@@ -4,6 +4,7 @@
  * main - entry point
  * @argc: argument count
  * @argv: argument vector
+ * @env: environment list
  *
  * Return: 0
  */

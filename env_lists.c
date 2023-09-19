@@ -2,7 +2,7 @@
 /**
  * create_env_list - creates a linked list of environment variables
  * @env_list: pointer to a pointer to the head of the list
- * @environ: pointer to the environment variables
+ * @env: pointer to the environment variables
  *
  * Return: 1 on success, 0 on failure
  */
