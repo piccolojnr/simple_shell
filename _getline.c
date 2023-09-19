@@ -8,7 +8,7 @@
  * 
  * Return: buffer
  */
-char **_fgets(info_t *info, char **buffer, size_t *characters, int fd)
+char **_fgets(info_t *info, char **buffer, size_t *characters, FILE *fd)
 {
 int bufsize;
 
@@ -123,7 +123,7 @@ return (_ptr);
  * Return: the lenghh of lnptr or -1 on failure
  */
 
-int _getline(char **lnptr, size_t *size, int fd)
+int _getline(char **lnptr, size_t *size, FILE *fd)
 {
 char buffer[BUFFER_SIZE + 1];
 int r = BUFFER_SIZE, len = 0, mode = isatty(0);
@@ -136,7 +136,7 @@ while (r == BUFFER_SIZE)
 if (*lnptr && len > 0)
 if ((*lnptr)[len - 1] == '\n' && mode)
 break;
-r = read(fd, buffer, BUFFER_SIZE);
+r = read(fileno(fd), buffer, BUFFER_SIZE);
 if (r < 0 && errno == EINTR)
 {
 **lnptr = '\n', *(*lnptr + 1) = '\n', len = 2;

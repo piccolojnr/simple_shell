@@ -11,7 +11,7 @@
 int main(int argc, char **argv, char **env)
 {
 	t_env *env_list;
-	(void)argc;
+	alias_t *alias_list;
 
 	if (!create_env_list(&env_list, env))
 	{
@@ -19,5 +19,10 @@ int main(int argc, char **argv, char **env)
 		exit(EXIT_FAILURE);
 	}
 
-	return (run_shell(&env_list, argv[0]));
+	if (argc == 1)
+	return (run_shell_interactive(&env_list, &alias_list));
+	else if (argc == 2)
+	return (run_shell_non_interactive(&env_list, &alias_list, argv[1]));
+	else
+	return (0);
 }

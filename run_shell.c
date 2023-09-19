@@ -1,50 +1,28 @@
 #include "shell.h"
 /**
- * run_shell - Runs the shell
+ * run_shell_interactive - Runs the shell
  * @env_list: ...
  * @name: name of program
  *
  * Return: 0 for success, 1 for failure
  */
-int run_shell(t_env **env_list, char *name)
+int run_shell_interactive(t_env **env_list, alias_t **alias_list)
 {
-	int shell_status = 1, i;
+	int shell_status = 1;
 	info_t *info = malloc(sizeof(info_t));
-	alias_t *alias_list = NULL;
-	char *line, *filtered_line, **args, *trimmed, *delim = ";";
+	char *line;
 	size_t char_len = 0;
-	(void)name;
 
 	while (shell_status)
 	{
 		_printf("piccolojnr@:~$ ");
-		if (_fgets(info, &line, &char_len, fileno(stdin)) == NULL)
+		if (_fgets(info, &line, &char_len, stdin) == NULL)
 		{
 			perror("\n");
 			free(info);
 			break;
 		}
-		if (is_line_empty(line))
-			continue;
-		filtered_line = filter_comments(line);
-		if (filtered_line == NULL)
-			continue;
-		free(line);
-		split_str(filtered_line, &args, delim);
-		if (args == NULL)
-			continue;
-		for (i = 0; args[i] != NULL; i++)
-		{
-			trimmed = trimWhitespace(args[i]);
-
-			free(args[i]);
-			args[i] = trimmed;
-
-			if (args[i] != NULL && !is_line_empty(args[i]))
-			{
-				handle_logical_operators(args[i], &info, env_list, &alias_list);
-			}
-		}
+		run_shell(&info, env_list, alias_list, line);
 	}
 	exit_shell(info, EXIT_SUCCESS);
 	return (0);
