@@ -88,14 +88,14 @@ int start_process(info_t **, t_env **, alias_t **);
 void find_executable(info_t **, t_env **, alias_t **);
 char *filter_comments(const char *);
 int handle_logical_operators(char *, info_t **,
-							t_env **, alias_t **);
+							 t_env **, alias_t **);
 
 /* _getline */
 int _getline(char **, size_t *, FILE *);
 char **_fgets(info_t *, char **, size_t *, FILE *);
 void *_realloc(void *, unsigned int);
 void *_malloc(unsigned int);
-void *_realloc2(void *, unsigned int , unsigned int );
+void *_realloc2(void *, unsigned int z, unsigned int);
 
 /* executable_cmd */
 int execute_command(info_t **);
@@ -126,12 +126,10 @@ char *trimWhitespace(const char *str);
 int find_builtin(info_t *, t_env **, alias_t **);
 void replace_env_var(info_t **, t_env *);
 void replace_args(info_t **);
-void replace_with_env_var(info_t **, int , const char *,
-							t_env *);
-void replace_with_status(info_t **, int );
-void replace_with_pid(info_t **, int , pid_t );
-
-
+void replace_with_env_var(info_t **, int, const char *,
+						  t_env *);
+void replace_with_status(info_t **, int);
+void replace_with_pid(info_t **, int, pid_t);
 
 /* builtin_1 */
 int which_builtin(info_t *, t_env **, alias_t **);
@@ -160,13 +158,13 @@ void exit_shell(info_t *, int);
 char **split_env(char *);
 char *concat_path_and_cmd(const char *, const char *);
 int is_line_empty(const char *);
-int isspace(int );
-char *int_to_string(int );
+int isspace(int);
+char *int_to_string(int);
 
 /* helper 2*/
-int count_digits(int );
+int count_digits(int);
 int execute_logical_command(info_t **,
-		t_env **, alias_t **, int );
+							t_env **, alias_t **, int);
 
 /* env_lists */
 int create_env_list(t_env **, char **);
