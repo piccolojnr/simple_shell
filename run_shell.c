@@ -2,7 +2,7 @@
 /**
  * run_shell_interactive - Runs the shell
  * @env_list: ...
- * @name: name of program
+ * @alias_list: ...
  *
  * Return: 0 for success, 1 for failure
  */

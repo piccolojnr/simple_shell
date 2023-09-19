@@ -5,7 +5,7 @@
  * @buffer: buffer with commands
  * @characters: number of characters
  * @fd: file descriptor
- * 
+ *
  * Return: buffer
  */
 char **_fgets(info_t *info, char **buffer, size_t *characters, FILE *fd)
