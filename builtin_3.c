@@ -1,91 +1,86 @@
 #include "shell.h"
+int replace_string(char **old, char *new);
+char *convert_number(long int num, int base, int flags);
+
 /**
  * replace_env_var - Replaces environment variable references in argv
  * @info: Pointer to the info_t structure
  */
 void replace_env_var(info_t **info)
 {
-	pid_t shell_pid = getpid();
 	int i;
 	char *env_name;
 
 	for (i = 0; i < (*info)->argc; i++)
 	{
-		if ((*info)->argv[i][0] == '$'
-		&& (*info)->argv[i][1] != '\0' && (*info)->argv[i][1] != '\n')
+		if ((*info)->argv[i][0] != '$' || !(*info)->argv[i][1])
+			continue;
+		else if (!_strcmp((*info)->argv[i], "$?"))
 		{
-			env_name = (*info)->argv[i] + 1; /* Skip the '$' symbol */
-			if (_strcmp(env_name, "$") == 0)
-				replace_with_pid(info, i, shell_pid);
-			else if (_strcmp(env_name, "?") == 0)
-				replace_with_status(info, i);
+			replace_string(&((*info)->argv[i]),
+						   _strdup(convert_number((*info)->status, 10, 0)));
+			continue;
+		}
+		else if (!_strcmp((*info)->argv[i], "$$"))
+		{
+			replace_string(&((*info)->argv[i]),
+						   _strdup(convert_number(getpid(), 10, 0)));
+			continue;
+		}
+		else
+		{
+			env_name = _getenv((*info)->argv[i] + 1, (*info)->env);
+			if (env_name)
+				replace_string(&((*info)->argv[i]), _strdup(env_name));
 			else
-				replace_with_env_var(info, i, env_name);
+				replace_string(&((*info)->argv[i]), _strdup(""));
 		}
 	}
-	replace_args(info);
 }
 /**
- * replace_with_pid - ...
- * @info: ...
- * @index: ...
- * @shell_pid: ...
+ * replace_string - replaces string
+ * @old: address of old string
+ * @new: new string
+ *
+ * Return: 1 if replaced, 0 otherwise
  */
-void replace_with_pid(info_t **info, int index, pid_t shell_pid)
+int replace_string(char **old, char *new)
 {
-	char *new_arg = int_to_string((int)shell_pid);
-
-	if (new_arg == NULL)
-	{
-		perror("int_to_string");
-		exit_shell(*info, EXIT_FAILURE);
-	}
-	free((*info)->argv[index]);
-	(*info)->argv[index] = new_arg;
+	free(*old);
+	*old = new;
+	return (1);
 }
 /**
- * replace_with_status - ...
- * @info: ...
- * @index: ...
+ * convert_number - converter function, a clone of itoa
+ * @num: number
+ * @base: base
+ * @flags: argument flags
+ *
+ * Return: string
  */
-void replace_with_status(info_t **info, int index)
+char *convert_number(long int num, int base, int flags)
 {
-	char *new_arg = int_to_string((*info)->status);
+	static char *array;
+	static char buffer[50];
+	char sign = 0;
+	char *ptr;
+	unsigned long n = num;
 
-	if (new_arg == NULL)
+	if (!(flags & CONVERT_UNSIGNED) && num < 0)
 	{
-		perror("int_to_string");
-		exit_shell(*info, EXIT_FAILURE);
+		n = -num;
+		sign = '-';
 	}
-	free((*info)->argv[index]);
-	(*info)->argv[index] = new_arg;
-}
-/**
- * replace_with_env_var - ...
- * @info: ...
- * @index: ...
- * @env_name: ...
- */
-void replace_with_env_var(info_t **info, int index, const char *env_name)
-{
-	char *env_value = _getenv(env_name, (*info)->env);
+	array = flags & CONVERT_LOWERCASE ? "0123456789abcdef" : "0123456789ABCDEF";
+	ptr = &buffer[49];
+	*ptr = '\0';
 
-	if (env_value)
-	{
-		char *new_arg = _strdup(env_value);
+	do {
+		*--ptr = array[n % base];
+		n /= base;
+	} while (n != 0);
 
-		if (!new_arg)
-		{
-			perror("strdup");
-			exit_shell(*info, EXIT_FAILURE); /* Handle memory allocation failure */
-		}
-		free((*info)->argv[index]);		/* Free the old argument */
-		(*info)->argv[index] = new_arg; /* Assign the new argument */
-	}
-	else
-	{
-		/* Environment variable not found, set the argument to NULL */
-		free((*info)->argv[index]); /* Free the old argument */
-		(*info)->argv[index] = NULL;
-	}
+	if (sign)
+		*--ptr = sign;
+	return (ptr);
 }

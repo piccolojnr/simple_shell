@@ -9,7 +9,8 @@
 int main(int argc, char **argv)
 {
 	info_t *info = _malloc(sizeof(info_t));
-	char input[MAX__LENGTH];
+	char input[MAX__LENGTH], **args;
+	int len, i;
 
 	if (!create_env_list(&info))
 	{
@@ -23,7 +24,11 @@ int main(int argc, char **argv)
 		if (!isatty(fileno(stdin)))
 			if (custom_fgets(input, sizeof(input), stdin) != NULL)
 			{
-				run_shell(&info, input);
+				len = split_str(input, &args, " \n");
+				for (i = 0; i < len; i++)
+				{
+					run_shell(&info, args[i]);
+				}
 			}
 			else
 			{

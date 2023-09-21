@@ -6,6 +6,10 @@
 #define MAX_ALIASES 50
 #define MAX_ALIAS_LEN 100
 
+/* for convert_number() */
+#define CONVERT_LOWERCASE 1
+#define CONVERT_UNSIGNED 2
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -91,7 +95,7 @@ int run_shell(info_t **, char *);
 /* run_shell */
 int start_process(info_t **);
 void find_executable(info_t **);
-char *filter_comments(const char *);
+char *filter_comments(char *);
 int handle_logical_operators(char *, info_t **);
 
 /* _getline */
@@ -129,10 +133,6 @@ char *trimWhitespace(const char *str);
 /* builtin */
 int find_builtin(info_t **);
 void replace_env_var(info_t **);
-void replace_args(info_t **);
-void replace_with_env_var(info_t **, int, const char *);
-void replace_with_status(info_t **, int);
-void replace_with_pid(info_t **, int, pid_t);
 
 /* builtin_1 */
 int which_builtin(info_t **);

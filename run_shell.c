@@ -77,43 +77,21 @@ int handle_logical_operators(char *line, info_t **info)
 }
 /**
  * filter_comments - Removes comments from a string
- * @line: The string to remove comments from
+ * @buf: The string to remove comments from
  *
  * Return: The string with comments removed
  */
-char *filter_comments(const char *line)
+char *filter_comments(char *buf)
 {
-	const char *commentPos;
-	char *new_line;
-	size_t len;
+	int i;
 
-	if (line == NULL)
-		return (NULL);
-
-	/*Find the position of the '#' character in the string*/
-	commentPos = (const char *)_strchr((char *)line, '#');
-
-	if (commentPos == NULL)
-	{
-		return (_strdup(line));
-	}
-	else
-	{
-		/*Calculate the length of the portion before the comment character*/
-		len = commentPos - line;
-
-		/*Allocate memory for the new string */
-		new_line = (char *)malloc(len + 1);
-
-		if (new_line != NULL)
+	for (i = 0; buf[i] != '\0'; i++)
+		if (buf[i] == '#' && (!i || buf[i - 1] == ' '))
 		{
-			/*Copy the portion before the comment character*/
-			strncpy(new_line, line, len);
-			new_line[len] = '\0'; /*Null-terminate the new string*/
+			buf[i] = '\0';
+			break;
 		}
-
-		return (new_line);
-	}
+	return (buf);
 }
 /**
  * start_process - Starts a process
@@ -128,7 +106,7 @@ int start_process(info_t **info)
 	(*info)->line[(*info)->char_len - 1] = '\0';
 
 	/* Split the input line into arguments */
-	(*info)->argc = split_str((*info)->line, &(*info)->argv, " \n\t\r\v\f");
+	(*info)->argc = split_str((*info)->line, &(*info)->argv, " \t");
 
 	if ((*info)->argv == NULL || (*info)->argc == 0)
 		return (EXIT_FAILURE); /* Ignore empty lines or input errors */
