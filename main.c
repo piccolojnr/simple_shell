@@ -9,7 +9,7 @@
 int main(int argc, char **argv)
 {
 	info_t info = INFO_INIT;
-	char input[MAX__LENGTH], **args = NULL;
+	char input[MAX__LENGTH], **args = NULL, *trimm;
 	int len, i, ret = 0;
 
 	if (1)
@@ -19,7 +19,9 @@ int main(int argc, char **argv)
 			if (!isatty(fileno(stdin)))
 				if (custom_fgets(input, sizeof(input), stdin) != NULL)
 				{
-					len = split_str(input, &args, "\n");
+					trimm = trimWhitespace(input);
+					len = split_str(trimm, &args, "\n");
+					free(trimm);
 					if (args == NULL)
 					{
 						free_env(info.env);
