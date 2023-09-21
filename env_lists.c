@@ -3,16 +3,16 @@
  * create_env_list - creates a linked list of environment variables
  * @info: ...
  *
- * Return: 1 on success, 0 on failure
+ * Return: EXIT_SUCCESS on success, EXIT_FAILURE on failure
  */
-int create_env_list(info_t **info)
+int create_env_list(info_t *info)
 {
 	int i;
 	t_env *head = NULL;
 	char *name, *value, **args;
 
 	if (environ == NULL)
-		return (0);
+		return (EXIT_SUCCESS);
 
 	for (i = 0; environ[i]; i++)
 	{
@@ -23,14 +23,15 @@ int create_env_list(info_t **info)
 		name = args[0];
 		value = args[1];
 
-		if (!add_env_node_end(name, value, &(*info)->env))
+		if (!add_env_node_end(name, value, &(info->env)))
 		{
-			free_env_list(head);
-			return (0);
+			free_env(head);
+			return (EXIT_FAILURE);
 		}
+		free(args);
 	}
 
-	return (1);
+	return (EXIT_SUCCESS);
 }
 /**
  * add_env_node_end - adds a new node at the beginning
@@ -129,10 +130,10 @@ int edit_env_node(char *name, char *new_value, t_env **env_list)
 	return (0);
 }
 /**
- * free_env_list - frees a linked list
+ * free_env - frees a linked list
  * @head: head of the linked list
  */
-void free_env_list(t_env *head)
+void free_env(t_env *head)
 {
 	t_env *current;
 
@@ -142,5 +143,6 @@ void free_env_list(t_env *head)
 		head = head->next;
 		free(current->name);
 		free(current->value);
+		free(current);
 	}
 }

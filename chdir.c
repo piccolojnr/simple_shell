@@ -8,7 +8,7 @@
 */
 int handle_dash(info_t *info, t_env **env_list)
 {
-char *oldpwd = _getenv("OLDPWD", *env_list);
+char *oldpwd = _getenv("OLDPWD");
 if (oldpwd)
 {
 free(info->argv[1]);
@@ -31,7 +31,7 @@ return (1);
 int change_directory(const char *target_directory, t_env **env_list)
 {
 char *pwd = _strdup(target_directory);
-char *oldpwd = _getenv("PWD", *env_list);
+char *oldpwd = _getenv("PWD");
 char *newpwd;
 if (oldpwd)
 {

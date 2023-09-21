@@ -10,11 +10,10 @@
 int split_str(char *str, char ***args, char *delim)
 {
 	int word_count = 0;
-	char *token, **temp, *str_copy = NULL;
+	char *token, **temp = NULL, *str_copy = NULL;
 
 	if (!str || !args || !delim)
 		return (-1);
-
 	*args = NULL;
 	str_copy = _strdup(str);
 	if (!str_copy)
@@ -22,17 +21,17 @@ int split_str(char *str, char ***args, char *delim)
 		perror("Memory allocation failed");
 		return (-1);
 	}
-
 	token = _strtok(str_copy, delim);
 	while (token)
 	{
 		word_count++;
-		temp = _realloc2(temp, sizeof(char *) * (word_count - 1)
-							, sizeof(char *) * (word_count + 1));
+		temp = _realloc2(temp, sizeof(char *) *
+		(word_count - 1), sizeof(char *) * (word_count + 1));
 		if (!temp)
 		{
 			perror("Memory allocation failed");
 			free(str_copy);
+			free(token);
 			return (-1);
 		}
 		*args = temp;
@@ -40,13 +39,15 @@ int split_str(char *str, char ***args, char *delim)
 		if (!(*args)[word_count - 1])
 		{
 			perror("Memory allocation failed");
-			free(str_copy);
+			free(str_copy), free(token);
+			if (word_count > 1)
+				free_args(*args);
 			return (-1);
 		}
 		(*args)[word_count] = NULL;
-		token = _strtok(NULL, delim);
+		free(token), token = _strtok(NULL, delim);
 	}
-	free(str_copy);
+	free(token), free(str_copy);
 	return (word_count);
 }
 

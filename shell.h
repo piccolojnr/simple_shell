@@ -10,6 +10,11 @@
 #define CONVERT_LOWERCASE 1
 #define CONVERT_UNSIGNED 2
 
+#define INFO_INIT                                \
+	{                                            \
+		NULL, 0, NULL, NULL, 0, 0, 0, NULL, NULL \
+	}
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -82,21 +87,23 @@ typedef struct command_info
 typedef struct tbt
 {
 	char *type;
-	int (*func)(info_t **);
+	int (*func)(info_t *);
 } builtin_table;
 
 /* environment */
 extern char **environ;
+/* main */
+void free_info(info_t *info);
 
-int run_shell_non_interactive(info_t **, char *);
-int run_shell_interactive(info_t **);
-int run_shell(info_t **, char *);
+int run_shell_non_interactive(info_t *, char *);
+int run_shell_interactive(info_t *);
+int run_shell(info_t *, char *);
 
 /* run_shell */
-int start_process(info_t **);
-void find_executable(info_t **);
+int start_process(info_t *);
+int find_executable(info_t *);
 char *filter_comments(char *);
-int handle_logical_operators(char *, info_t **);
+int handle_logical_operators(char *, info_t *);
 
 /* _getline */
 int _getline(char **, size_t *, FILE *);
@@ -106,8 +113,8 @@ void *_malloc(unsigned int);
 void *_realloc2(void *, unsigned int z, unsigned int);
 
 /* executable_cmd */
-int execute_command(info_t **);
-void handle_execution_error(info_t **info);
+int execute_command(info_t *);
+void handle_execution_error(info_t *info);
 
 /* string */
 int split_str(char *, char ***, char *);
@@ -131,22 +138,25 @@ int replace_str(char **, char *, char *);
 char *trimWhitespace(const char *str);
 
 /* builtin */
-int find_builtin(info_t **);
-void replace_env_var(info_t **);
+int find_builtin(info_t *);
+int replace_env_var(info_t *);
 
 /* builtin_1 */
-int which_builtin(info_t **);
-int exit_builtin(info_t **);
-int env_builtin(info_t **);
-int setenv_builtin(info_t **);
-int unsetenv_builtin(info_t **);
+int which_builtin(info_t *);
+int exit_builtin(info_t *);
+int env_builtin(info_t *);
+int setenv_builtin(info_t *);
+int unsetenv_builtin(info_t *);
 
 /* builtin_2 */
-int chdir_builtin(info_t **);
-int alias_builtin(info_t **);
-
+int chdir_builtin(info_t *);
+int alias_builtin(info_t *);
+int logical_operators_helper(info_t *info, char **tmp, char *line, int start,
+							 int end, int is_and_operator, int *exit_status, int success);
+int replace_string(char **old, char *new);
+char *convert_number(long int num, int base, int flags);
 /* get_env */
-char *_getenv(const char *, t_env *);
+char *_getenv(const char *);
 int _setenv(const char *, const char *, int, t_env **);
 int _unsetenv(const char *, t_env **);
 
@@ -155,7 +165,7 @@ char *allocate_and_copy(const char *, int);
 int count_words(const char *, char *);
 int is_delim(char, char *);
 int _atoi(char *);
-void exit_shell(info_t *, int);
+char *extract_substring(char *line, int start, int end);
 
 /** helper 1*/
 char **split_env(char *);
@@ -166,14 +176,16 @@ char *int_to_string(int);
 
 /* helper 2*/
 int count_digits(int);
-int execute_logical_command(info_t **, int);
+int execute_logical_command(info_t *, int);
 int is_path(const char *str);
 char *custom_fgets(char *str, int size, FILE *stream);
+void ffree(char **str);
+int is_logical_operator(char *line, int index);
 
 /* env_lists */
-int create_env_list(info_t **);
+int create_env_list(info_t *);
 int add_env_node_end(const char *, const char *, t_env **);
-void free_env_list(t_env *);
+void free_env(t_env *);
 int edit_env_node(char *, char *, t_env **);
 int remove_env_node(char *, t_env **);
 
@@ -195,6 +207,7 @@ alias_t *get_alias(alias_t *, char *);
 int add_alias_node_end(const char *, const char *, alias_t **);
 int edit_alias_node(char *, char *, alias_t **);
 int remove_alias_node(char *, alias_t **);
+void free_alias(alias_t *head);
 
 /* chdir */
 int change_directory(const char *, t_env **);

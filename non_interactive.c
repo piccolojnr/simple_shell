@@ -6,34 +6,37 @@
  *
  * Return: 0 for success, 1 for failure
  */
-int run_shell_non_interactive(info_t **info, char *name)
+int run_shell_non_interactive(info_t *info, char *name)
 {
 int i;
-char *line, **args;
+char *line, **args = NULL;
 size_t char_len = 0;
 FILE *file = NULL;
 file = fopen(name, "r");
 if (file == NULL)
 {
 perror("failed to open file");
-free(*info);
 return (EXIT_FAILURE);
 }
-while (_fgets(*info, &line, &char_len, file) != NULL)
+while (_fgets(info, &line, &char_len, file) != NULL)
 {
 split_str(line, &args, "\n");
+free(line);
 if (args != NULL)
 {
 for (i = 0; args[i] != NULL; i++)
 {
-run_shell(info, args[i]);
+if (run_shell(info, args[i]) == -2)
+{
+free_args(args);
+free(args[i]);
+return (EXIT_FAILURE);
+}
 free(args[i]);
 }
 free_args(args);
 }
 }
-free(line);
-free(*info);
 fclose(file);
 return (EXIT_SUCCESS);
 }
@@ -44,10 +47,10 @@ return (EXIT_SUCCESS);
  *
  * Return: ...
  */
-int run_shell(info_t **info, char *line)
+int run_shell(info_t *info, char *line)
 {
 int i;
-char *filtered_line, **args, *trimmed, *delim = ";";
+char *filtered_line, **args = NULL, *trimmed, *delim = ";";
 if (is_line_empty(line))
 return (1);
 filtered_line = filter_comments(line);
@@ -63,8 +66,10 @@ free(args[i]);
 args[i] = trimmed;
 if (args[i] != NULL && !is_line_empty(args[i]))
 {
-handle_logical_operators(args[i], info);
+if (handle_logical_operators(args[i], info) == -2)
+return (-2);
 }
 }
+free_args(args);
 return (0);
 }

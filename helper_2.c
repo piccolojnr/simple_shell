@@ -23,9 +23,12 @@ int count_digits(int num)
  *
  * Return: The exit status of the logical command.
  */
-int execute_logical_command(info_t **info, int and_operator)
+int execute_logical_command(info_t *info, int and_operator)
 {
 	int exit_status = start_process(info);
+
+	if (exit_status == -2)
+		return (-2);
 
 	if ((and_operator && exit_status == 0) ||
 		(!and_operator && exit_status != 0))
@@ -53,11 +56,36 @@ int is_path(const char *str)
 	}
 
 	/* Check for Windows drive letter followed by ':' */
-	if (str[1] == ':' && ((str[0] >= 'A'
-	&& str[0] <= 'Z') || (str[0] >= 'a' && str[0] <= 'z')))
+	if (str[1] == ':' && ((str[0] >= 'A' && str[0] <= 'Z')
+	|| (str[0] >= 'a' && str[0] <= 'z')))
 	{
 		return (1); /* Matches the format of a Windows path */
 	}
 
 	return (0);
+}
+/**
+ * ffree - frees a double pointer
+ * @str: double pointer
+ */
+void ffree(char **str)
+{
+	int i;
+
+	for (i = 0; str[i]; i++)
+	{
+		free(str[i]);
+	}
+}
+/**
+ * is_logical_operator - checks if a string is a logical operator
+ * @line: the string to check
+ * @index: the index of the character in line to check
+ *
+ * Return: 1 if the character is a logical operator
+*/
+int is_logical_operator(char *line, int index)
+{
+return ((line[index] == '&' && line[index + 1] == '&') ||
+(line[index] == '|' && line[index + 1] == '|'));
 }

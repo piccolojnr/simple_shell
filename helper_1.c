@@ -10,38 +10,38 @@ char **split_env(char *str)
 char *str_copy, **result = NULL, *name = NULL,
 *value = NULL, *token = NULL;
 const char *delimiter = "=";
-
 if (!str)
 return (NULL);
 str_copy = _strdup(str);
 if (!str_copy)
 {
+perror("split_env: strdup");
 return (NULL);
 }
 token = _strtok(str_copy, delimiter);
 if (token)
 {
-name = _strdup(token);
+name = _strdup(token), free(token);
 if (!name)
 {
-perror("strdup"), free(str_copy);
+perror("split_env: strdup"), perror("strdup"), free(str_copy);
 return (NULL);
 }
 token = _strtok(NULL, delimiter);
 if (token)
 {
-value = _strdup(token);
+value = _strdup(token), free(token);
 if (!value)
 {
-perror("strdup"), free(name), free(str_copy);
+perror("split_env: strdup"), free(name), free(str_copy);
 return (NULL);
 }
 }
 }
-result = (char **)malloc(sizeof(char *) * 2);
+result = (char **)malloc(sizeof(char *) * 3);
 if (!result)
 {
-perror("malloc"), free(name), free(value), free(str_copy);
+perror("split_env: malloc"), free(name), free(value), free(str_copy);
 return (NULL);
 }
 result[0] = name, result[1] = value, result[2] = NULL;
@@ -66,8 +66,8 @@ size_t result_len = path_len + 1 + cmd_len + 1;
 char *result = (char *)malloc(result_len);
 if (result == NULL)
 {
-perror("Memory allocation failed");
-exit(EXIT_FAILURE);
+perror("concat path");
+return (NULL);
 }
 /* Copy the path and add a '/' character */
 _strcpy(result, path);
@@ -98,8 +98,8 @@ return (0);
  */
 int isspace(int c)
 {
-return (c == ' ' || c == '\t' || c == '\n' || c == '\v'
-|| c == '\f' || c == '\r' || c == '\0');
+return (c == ' ' || c == '\t' || c == '\n' || c == '\v' ||
+c == '\f' || c == '\r' || c == '\0');
 }
 
 /**
@@ -132,13 +132,11 @@ str[0] = '0';
 str[1] = '\0';
 return (str);
 }
-
 for (i = num_digits - 1; i >= 0; i--)
 {
 str[i] = (num % 10) + '0';
 num /= 10;
 }
-
 str[num_digits] = '\0';
 if (is_negative)
 {

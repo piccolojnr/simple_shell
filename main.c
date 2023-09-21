@@ -8,37 +8,49 @@
  */
 int main(int argc, char **argv)
 {
-	info_t *info = _malloc(sizeof(info_t));
-	char input[MAX__LENGTH], **args;
-	int len, i;
+	info_t info = INFO_INIT;
+	char input[MAX__LENGTH], **args = NULL;
+	int len, i, ret = 0;
 
-	if (!create_env_list(&info))
+	if (1)
 	{
-		perror("main");
-		exit(EXIT_FAILURE);
-	}
-
-	if (argc == 1)
-	{
-
-		if (!isatty(fileno(stdin)))
-			if (custom_fgets(input, sizeof(input), stdin) != NULL)
-			{
-				len = split_str(input, &args, " \n");
-				for (i = 0; i < len; i++)
+		if (argc == 1)
+		{
+			if (!isatty(fileno(stdin)))
+				if (custom_fgets(input, sizeof(input), stdin) != NULL)
 				{
-					run_shell(&info, args[i]);
+					len = split_str(input, &args, "\n");
+					if (args == NULL)
+					{
+						free_env(info.env);
+						return (EXIT_FAILURE);
+					}
+					for (i = 0; i < len; i++)
+						ret = run_shell(&info, args[i]);
+					free_args(args);
 				}
-			}
+				else
+					ret = EXIT_FAILURE;
 			else
-			{
-				perror("main");
-				free(info);
-			}
+				ret = run_shell_interactive(&info);
+		}
+		else if (argc == 2)
+			ret = run_shell_non_interactive(&info, argv[1]);
 		else
-			return (run_shell_interactive(&info));
+			ret = EXIT_FAILURE;
 	}
-	else if (argc == 2)
-		return (run_shell_non_interactive(&info, argv[1]));
-	return (0);
+	else
+		ret = EXIT_FAILURE;
+	free_info(&info);
+	return (ret);
+}
+/**
+ * free_info - ...
+ * @info: ...
+ */
+void free_info(info_t *info)
+{
+	free(info->argv);
+	free_alias(info->aliases);
+	free_env(info->env);
 }

@@ -9,7 +9,7 @@
  * Return: 1 on success, 0 on failure
  */
 int add_alias_node_end(const char *name, const char *value,
-									alias_t **alias_list)
+					   alias_t **alias_list)
 {
 	alias_t *new = (alias_t *)malloc(sizeof(alias_t));
 
@@ -96,4 +96,21 @@ int edit_alias_node(char *name, char *new_value, alias_t **alias_list)
 	}
 
 	return (0);
+}
+/**
+ * free_alias - ...
+ * @head: ...
+ */
+void free_alias(alias_t *head)
+{
+	alias_t *current;
+
+	while (head)
+	{
+		current = head;
+		head = head->next;
+		free(current->name);
+		free(current->value);
+		free(current);
+	}
 }

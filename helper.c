@@ -94,12 +94,15 @@ int _atoi(char *s)
 	return (output);
 }
 /**
- * exit_shell - exits the shell
- * @info: the parameter & return info struct
- * @exit_status: the exit status
- */
-void exit_shell(info_t *info, int exit_status)
+ * extract_substring - extracts a substring
+ * @line: the string to extract from
+ * @start: the starting index
+ * @end: the ending index
+ *
+ * Return: the substring
+*/
+char *extract_substring(char *line, int start, int end)
 {
-	free(info);
-	exit(exit_status);
+int len = end - start;
+return (_strndup(line + start, len));
 }

@@ -11,12 +11,12 @@
 char **_fgets(info_t *info, char **buffer, size_t *characters, FILE *fd)
 {
 int bufsize;
-
+(void)info;
 bufsize = _getline(buffer, characters, fd);
 if (bufsize == -1)
 {
 _printf("\n");
-exit_shell(info, EXIT_FAILURE);
+return (NULL);
 return (NULL);
 }
 return (buffer);
@@ -87,6 +87,7 @@ return (NULL);
 filler = mem;
 for (index = 0; index < old_size && index < new_size; index++)
 filler[index] = *ptr_copy++;
+free(ptr);
 return (mem);
 }
 /**
@@ -94,17 +95,16 @@ return (mem);
  * @size: ...
  *
  * Return: ...
-*/
+ */
 void *_malloc(unsigned int size)
 {
 char *ptr = malloc(size);
 void *_ptr = NULL;
 unsigned int i = 0;
-
 if (!ptr)
 {
 _printf("ERROR ALLOCATING MEMORY");
-exit(EXIT_FAILURE);
+return (NULL);
 }
 while (i < size)
 {
@@ -128,7 +128,6 @@ int _getline(char **lnptr, size_t *size, FILE *fd)
 char buffer[BUFFER_SIZE + 1];
 int r = BUFFER_SIZE, len = 0, mode = isatty(0);
 char *tmp;
-
 *lnptr = (char *)_malloc(4);
 **lnptr = '\0';
 while (r == BUFFER_SIZE)
@@ -143,7 +142,7 @@ if (r < 0 && errno == EINTR)
 return (len);
 }
 if (r < 0)
-exit(-1);
+return (-1);
 if (r == 0 && mode)
 return (-1);
 tmp = _realloc(*lnptr, len + r + 4);

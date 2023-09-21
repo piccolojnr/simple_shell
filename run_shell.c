@@ -5,7 +5,7 @@
  *
  * Return: 0 for success, 1 for failure
  */
-int run_shell_interactive(info_t **info)
+int run_shell_interactive(info_t *info)
 {
 	int shell_status = 1;
 	char *line;
@@ -14,17 +14,19 @@ int run_shell_interactive(info_t **info)
 	while (shell_status)
 	{
 		_printf("$ ");
-		if (_fgets(*info, &line, &char_len, stdin) == NULL)
+		if (_fgets(info, &line, &char_len, stdin) == NULL)
 		{
 			perror("\n");
-			free(*info);
 			break;
 		}
-		run_shell(info, line);
+		if (run_shell(info, line) == -2)
+		{
+			free(line);
+			return (EXIT_FAILURE);
+		}
 		free(line);
 	}
-	exit_shell(*info, EXIT_SUCCESS);
-	return (0);
+	return (EXIT_SUCCESS);
 }
 /**
  * handle_logical_operators - Handles logical operators
@@ -33,48 +35,35 @@ int run_shell_interactive(info_t **info)
  *
  * Return: 1 on success, 0 on failure
  */
-int handle_logical_operators(char *line, info_t **info)
+int handle_logical_operators(char *line, info_t *info)
 {
-	int success = EXIT_SUCCESS, is_and_operator, len, start = 0, end = 0;
-	char *tmp;
+	int exit_status = 0, success = EXIT_SUCCESS,
+		is_and_operator = 0, start = 0, end = 0;
+	char *tmp = NULL;
 
 	while (line[end] != '\0')
 	{
-		if ((line[end] == '&' && line[end + 1] == '&') ||
-			(line[end] == '|' && line[end + 1] == '|'))
+		if (is_logical_operator(line, end))
 		{
 			if (line[end + 1] == '&')
 				is_and_operator = 1;
 			else
 				is_and_operator = 0;
-			len = end - (start + 1);
-			tmp = _strndup(line + start, len);
-			(*info)->line = tmp;
-			(*info)->char_len = _strlen(tmp) + 1;
-			if (!execute_logical_command(info, is_and_operator))
-			{
-				success = EXIT_FAILURE;
-				free(tmp);
+			success = logical_operators_helper(info, &tmp, line, start,
+											   end, is_and_operator, &exit_status, success);
+			if (success == EXIT_FAILURE || success == -2)
 				return (success);
-			}
-			free(tmp);
 			start = end + 2;
 		}
 		end++;
 	}
-	len = end - start;
-	tmp = _strndup(line + start, len);
-	(*info)->line = tmp;
-	(*info)->char_len = _strlen(tmp) + 1;
-	if (!execute_logical_command(info, is_and_operator))
-	{
-		success = EXIT_FAILURE;
-		free(tmp);
+	success = logical_operators_helper(info, &tmp, line, start,
+									   end, is_and_operator, &exit_status, success);
+	if (success == EXIT_FAILURE || success == -2)
 		return (success);
-	}
-	free(tmp);
 	return (success);
 }
+
 /**
  * filter_comments - Removes comments from a string
  * @buf: The string to remove comments from
@@ -99,82 +88,95 @@ char *filter_comments(char *buf)
  *
  * Return: The exit status of the process
  */
-int start_process(info_t **info)
+int start_process(info_t *info)
 {
 	int exit_status;
-	/* Remove newline */
-	(*info)->line[(*info)->char_len - 1] = '\0';
 
-	/* Split the input line into arguments */
-	(*info)->argc = split_str((*info)->line, &(*info)->argv, " \t");
-
-	if ((*info)->argv == NULL || (*info)->argc == 0)
+	info->line[info->char_len - 1] = '\0';
+	info->argc = split_str(info->line, &info->argv, " \t");
+	if (info->argv == NULL || info->argc == 0)
 		return (EXIT_FAILURE); /* Ignore empty lines or input errors */
-
-	replace_env_var(info);
-
-	if ((*info)->argc == 0)
-		return (EXIT_FAILURE);
-
-	/* Check if the command exists in the PATH and execute it */
-	find_executable(info);
-	if ((*info)->path != NULL && (*info)->is_built_in == -1)
+	exit_status = replace_env_var(info);
+	if (exit_status != EXIT_SUCCESS)
 	{
-		exit_status = execute_command(info);
-		free((*info)->path);
+		ffree(info->argv);
+		return (exit_status);
 	}
-	else if ((*info)->is_built_in != -1)
+	if (info->argc == 0)
 	{
-		return (EXIT_FAILURE);
+		exit_status = EXIT_FAILURE;
+	}
+	if (find_executable(info) == EXIT_FAILURE)
+	{
+		exit_status = EXIT_FAILURE;
 	}
 	else
-		_printf("%s: command not found\n", (*info)->argv[0]);
-
+	{
+		if (info->path != NULL && info->is_built_in == -1)
+		{
+			exit_status = execute_command(info);
+			free(info->path);
+		}
+		else if (info->is_built_in == -2)
+		{
+			exit_status = EXIT_FAILURE;
+		}
+		else if (info->is_built_in != -1)
+		{
+			exit_status = EXIT_SUCCESS;
+		}
+		else
+			_printf("%s: command not found\n", info->argv[0]);
+	}
+	ffree(info->argv);
 	return (exit_status);
 }
 
 /**
  * find_executable - Finds an executable in the PATH
  * @info: A pointer to a info_t struct
+ *
+ * Return: The exit status of the process
  */
-void find_executable(info_t **info)
+int find_executable(info_t *info)
 {
 	int i, path_len;
 	char *path;
-	char **path_buffer;
+	char **path_buffer = NULL;
 	char *path_with_cmd;
 
 	/* check for built ins */
-	(*info)->is_built_in = find_builtin(info);
-	if ((*info)->is_built_in != -1)
-		return;
-	if (is_path((*info)->argv[0]))
+	info->is_built_in = find_builtin(info);
+	if (info->is_built_in != -1)
+		return (EXIT_SUCCESS);
+	if (is_path(info->argv[0]))
 	{
-		(*info)->path = (*info)->argv[0];
-		return;
+		info->path = _strdup(info->argv[0]);
+		return (EXIT_SUCCESS);
 	}
-	path = _getenv("PATH", (*info)->env);
-	if (path == NULL || (*info)->argv[0] == NULL)
-		return;
+	path = _getenv("PATH");
+	if (path == NULL || info->argv[0] == NULL)
+		return (EXIT_FAILURE);
 	path_len = split_str(path, &path_buffer, ":");
+	free(path);
 	if (path_len == -1)
-		exit_shell(*info, EXIT_FAILURE);
+		return (EXIT_FAILURE);
 	for (i = 0; i < path_len; i++)
 	{
-		path_with_cmd = (char *)malloc(strlen(path_buffer[i])
-		+ strlen((*info)->argv[0]) + 2);
+		path_with_cmd = concat_path_and_cmd(path_buffer[i], info->argv[0]);
 		if (path_with_cmd == NULL)
 		{
-			perror("Memory allocation error");
-			exit_shell(*info, EXIT_FAILURE);
+			free(path_with_cmd);
+			return (EXIT_FAILURE);
 		}
-		path_with_cmd = concat_path_and_cmd(path_buffer[i], (*info)->argv[0]);
 		if (access(path_with_cmd, X_OK) == 0)
 		{
 			free_args(path_buffer); /* Clean up the path_buffer */
-			(*info)->path = path_with_cmd;
-			return;
+			info->path = path_with_cmd;
+			return (EXIT_SUCCESS);
 		}
 		free(path_with_cmd);
 	}
+	free_args(path_buffer);
+	return (EXIT_FAILURE);
 }

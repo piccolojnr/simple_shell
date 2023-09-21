@@ -2,27 +2,27 @@
 /**
  * _getenv - gets the environment variable
  * @name: name of the environment variable
- * @env_list: ...
  *
  * Return: value of the environment variable
  */
-char *_getenv(const char *name, t_env *env_list)
+char *_getenv(const char *name)
 {
-	t_env *current = env_list;
+	int i;
+	char **args, *res;
 
-	if (name == NULL || name[0] == '\0' || _strchr((char *)name, '=') != NULL)
-		return (NULL);
-
-	while (current != NULL)
+	for (i = 0; environ[i]; i++)
 	{
-		if (_strcmp(current->name, (char *)name) == 0)
+		args = split_env(environ[i]);
+		if (strcmp(args[0], name) == 0)
 		{
-			return (current->value);
+			res = args[1];
+			free(args[0]);
+			free(args);
+			return (res);
 		}
-
-		current = current->next;
+		else
+			free_args(args);
 	}
-
 	return (NULL);
 }
 /**
