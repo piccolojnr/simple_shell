@@ -1,19 +1,27 @@
 #ifndef SHELL_H
 #define SHELL_H
 
-#define MAX__LENGTH 1024
 #define BUFFER_SIZE 1024
-#define MAX_ALIASES 50
-#define MAX_ALIAS_LEN 100
 
 /* for convert_number() */
 #define CONVERT_LOWERCASE 1
 #define CONVERT_UNSIGNED 2
 
-#define INFO_INIT                                \
-	{                                            \
-		NULL, 0, NULL, NULL, 0, 0, 0, NULL, NULL \
+#define INFO_INIT                             \
+	{                                         \
+		NULL, 0, NULL, 0, NULL, 0, NULL, NULL \
 	}
+
+/* functions return */
+#define SUCCESS 0
+#define FAILURE 1
+#define EXIT -2
+
+/* builtin returns */
+#define BUILTIN_NOT_FOUND -1
+#define BUILTIN_SUCCESS 0
+#define BUILTIN_FAILURE 1
+#define BUILTIN_EXIT -2
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,189 +36,73 @@
 #include <fcntl.h>
 
 /**
- * struct alias_list - linked list of aliases
- * @name: alias
- * @value: value of alias
- * @next: ...
+ * struct info - information about the shell
+ * @argv: ...
+ * @argc: ...
+ * @path: ...
+ * @status: ...
+ * @cmds: ...
+ * @cmds_len: ...
+ * @env: ...
+ * @filename: ...
  */
-typedef struct alias_list
+typedef struct info
 {
-	char *name;
-	char *value;
-	struct alias_list *next;
-} alias_t;
-
-/**
- * struct env_list - linked list of environment variables
- * @name: name of environment variable
- * @value: value of environment variable
- * @next: pointer to next node
- */
-typedef struct env_list
-{
-	char *name;
-	char *value;
-	struct env_list *next;
-} t_env;
-
-/**
- * struct command_info - command information
- * @line: line of command
- * @path: command path
- * @argc: number of arguments
- * @argv: arguments
- * @char_len: length of char in line
- * @is_built_in: return value of built-in
- * @status: status of process
- * @env: environment variables
- * @aliases: aliases
- */
-typedef struct command_info
-{
-	char *line;
-	int argc;
 	char **argv;
+	int argc;
 	char *path;
-	int char_len;
-	int is_built_in;
 	int status;
 
-	t_env *env;
-	alias_t *aliases;
-} info_t;
+	char **cmds;
+	int cmds_len;
 
-/**
- * struct tbt - builtin table
- * @type: type of builtin
- * @func: function to call
- */
-typedef struct tbt
-{
-	char *type;
-	int (*func)(info_t *);
-} builtin_table;
+	char **env;
+	char *filename;
+} t_info;
 
-/* environment */
-extern char **environ;
-/* main */
-void free_info(info_t *info);
+/* shell */
+void run_interactive_shell(t_info *);
+void run_non_interactive_shell(t_info *);
+void run_file(t_info *);
+int start_process(t_info *);
+int fork_command(t_info *info);
 
-int run_shell_non_interactive(info_t *, char *);
-int run_shell_interactive(info_t *);
-int run_shell(info_t *, char *);
+/* getline */
+ssize_t _getline(char **lineptr, size_t *n, FILE *stream);
+int get_input(char **lineptr, size_t *n, FILE *stream, t_info *info);
 
-/* run_shell */
-int start_process(info_t *);
-int find_executable(info_t *);
-char *filter_comments(char *);
-int handle_logical_operators(char *, info_t *);
+/* string parser */
+int parse_string(char *str, const char *del, char ***args);
 
-/* _getline */
-int _getline(char **, size_t *, FILE *);
-char **_fgets(info_t *, char **, size_t *, FILE *);
-void *_realloc(void *, unsigned int);
-void *_malloc(unsigned int);
-void *_realloc2(void *, unsigned int z, unsigned int);
+/* helper functions 1*/
+int is_interactive(void);
+int is_delim(char c, const char *delim);
 
-/* executable_cmd */
-int execute_command(info_t *);
-void handle_execution_error(info_t *info);
+/* string manipulation 1*/
+char *trimm_str(char *str);
+int _strlen(const char *s);
+int count_substrings(char *str, const char *delim);
+char *_strdup(const char *s);
+char *_strcpy(char *dest, const char *src);
 
-/* string */
-int split_str(char *, char ***, char *);
-void free_args(char **);
-char *_strcpy(char *, const char *);
-char *_strncpy(char *, const char *, int n);
-int _strlen(char *);
+/* string manipulation 2*/
+void replace_char(char *str, char oldChar, char newChar);
+int find_num_sub(char *str, char *sub);
+char *_strcat(char *dest, const char *src);
+char *_strncat(char *dest, const char *src, int n);
+int _strcmp(char *s1, char *s2);
 
-/* string 2*/
-char *_strdup(const char *);
-char *_strndup(const char *, int);
-char *_strchr(char *, char);
-int _strcmp(char *, char *);
-int _strncmp(char *, char *, int);
-
-/* string 3*/
-char *_strcat(char *, const char *);
-char *_strncat(char *, const char *, int);
-int find_num_sub(char *, char *);
-int replace_str(char **, char *, char *);
-char *trimWhitespace(const char *str);
-
-/* builtin */
-int find_builtin(info_t *);
-int replace_env_var(info_t *);
-
-/* builtin_1 */
-int which_builtin(info_t *);
-int exit_builtin(info_t *);
-int env_builtin(info_t *);
-int setenv_builtin(info_t *);
-int unsetenv_builtin(info_t *);
-
-/* builtin_2 */
-int chdir_builtin(info_t *);
-int alias_builtin(info_t *);
-int logical_operators_helper(info_t *info, char **tmp, char *line, int start,
-							 int end, int is_and_operator, int *exit_status, int success);
-int replace_string(char **old, char *new);
-char *convert_number(long int num, int base, int flags);
-/* get_env */
-char *_getenv(const char *);
-int _setenv(const char *, const char *, int, t_env **);
-int _unsetenv(const char *, t_env **);
-
-/* helper */
-char *allocate_and_copy(const char *, int);
-int count_words(const char *, char *);
-int is_delim(char, char *);
-int _atoi(char *);
-char *extract_substring(char *line, int start, int end);
-
-/** helper 1*/
-char **split_env(char *);
-char *concat_path_and_cmd(const char *, const char *);
-int is_line_empty(const char *);
-int isspace(int);
-char *int_to_string(int);
-
-/* helper 2*/
-int count_digits(int);
-int execute_logical_command(info_t *, int);
-int is_path(const char *str);
-char *custom_fgets(char *str, int size, FILE *stream);
-void ffree(char **str);
-int is_logical_operator(char *line, int index);
-
-/* env_lists */
-int create_env_list(info_t *);
-int add_env_node_end(const char *, const char *, t_env **);
-void free_env(t_env *);
-int edit_env_node(char *, char *, t_env **);
-int remove_env_node(char *, t_env **);
-
-/* _strtok */
-char *_strtok(char *, const char *);
+/* string manipulation 3 */
+int _strncmp(char *s1, char *s2, int n);
+char *_strchr(char *s, char c);
+char *_strndup(const char *str, int n);
+char *_strncpy(char *dest, const char *src, int n);
 
 /* _puts */
-int _putchar(char);
-void _puts(char *);
-int _printf(const char *, ...);
+void _puts(char *str);
+int _putchar(char c);
 
-/* alias */
-void print_aliases(alias_t *);
-void print_specific_alias(alias_t *, char *);
-int define_alias(info_t *, int, alias_t **);
-alias_t *get_alias(alias_t *, char *);
-
-/* alias_lists */
-int add_alias_node_end(const char *, const char *, alias_t **);
-int edit_alias_node(char *, char *, alias_t **);
-int remove_alias_node(char *, alias_t **);
-void free_alias(alias_t *head);
-
-/* chdir */
-int change_directory(const char *, t_env **);
-int handle_dash(info_t *, t_env **);
+/* memory */
+void ffree(char **ar);
 
 #endif /* SHELL_H */
