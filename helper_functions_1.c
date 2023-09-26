@@ -55,3 +55,31 @@ int is_only_spaces(const char *str)
     }
     return (1);
 }
+/**
+ * concat_path_and_cmd - Concatenates a path and command.
+ * @path: The path to concatenate.
+ * @cmd: The command to concatenate.
+ *
+ * Return: A pointer to the concatenated string.
+ */
+char *concat_path_and_cmd(const char *path, const char *cmd)
+{
+    /* Calculate the total length needed for the result */
+    size_t path_len = _strlen((char *)path);
+    size_t cmd_len = _strlen((char *)cmd);
+    /* +1 for '/' and +1 for '\0' */
+    size_t result_len = path_len + 1 + cmd_len + 1;
+    /* Allocate memory for the result */
+    char *result = (char *)malloc(result_len);
+    if (result == NULL)
+    {
+        perror("concat path");
+        return (NULL);
+    }
+    /* Copy the path and add a '/' character */
+    _strcpy(result, path);
+    _strcat(result, "/");
+    /* Concatenate the command */
+    _strcat(result, cmd);
+    return (result);
+}

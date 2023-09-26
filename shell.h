@@ -67,6 +67,9 @@ void run_file(t_info *);
 int start_process(t_info *);
 int fork_command(t_info *info);
 
+/* path */
+int find_executable(t_info *info);
+
 /* getline */
 ssize_t _getline(char **lineptr, size_t *n, FILE *stream);
 int get_input(char **lineptr, size_t *n, FILE *stream, t_info *info);
@@ -79,6 +82,10 @@ int is_interactive(void);
 int is_delim(char c, const char *delim);
 int isspace(int c);
 int is_only_spaces(const char *str);
+char *concat_path_and_cmd(const char *path, const char *cmd);
+
+/* helper functions 2 */
+int is_path(const char *str);
 
 /* string manipulation 1*/
 char *trimm_str(char *str);

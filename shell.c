@@ -87,7 +87,8 @@ void run_file(t_info *info)
  */
 int start_process(t_info *info)
 {
-    int i, cmds_count, fork_status;
+    int i, cmds_count, fork_status, path_status;
+
     for (i = 0; info->argv[i]; i++)
     {
         cmds_count = parse_string(info->argv[i], " \t", &(*info).cmds);
@@ -103,8 +104,22 @@ int start_process(t_info *info)
         else
         {
             info->cmds_len = cmds_count;
+            path_status = find_executable(info);
+            if (path_status == EXIT)
+            {
+                ffree(info->cmds);
+                return (EXIT);
+            }
+            else if (path_status == FAILURE)
+            {
+                _puts(info->cmds[0]);
+                _puts(": command not found\n");
+                ffree(info->cmds);
+                continue;
+            }
             fork_status = fork_command(info);
             ffree(info->cmds);
+            free(info->path);
             if (fork_status == EXIT)
                 return (-2);
         }
@@ -130,8 +145,7 @@ int fork_command(t_info *info)
     if (child_pid == 0)
     {
         /* child process */
-        if (info->path == NULL)
-            info->path = info->cmds[0];
+
         if (execve(info->path, info->cmds, info->env) == -1)
         {
             perror(info->cmds[0]);
