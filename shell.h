@@ -77,6 +77,8 @@ int parse_string(char *str, const char *del, char ***args);
 /* helper functions 1*/
 int is_interactive(void);
 int is_delim(char c, const char *delim);
+int isspace(int c);
+int is_only_spaces(const char *str);
 
 /* string manipulation 1*/
 char *trimm_str(char *str);
