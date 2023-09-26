@@ -19,7 +19,7 @@ int find_executable(t_info *info)
         return (SUCCESS);
     }
     path = getenv("PATH");
-    if (path == NULL || info->cmds[0] == NULL)
+    if (path == NULL || info->cmds[0] == NULL || path[0] == '\0')
         return (FAILURE);
     path_len = parse_string(path, ":", &path_buffer);
     if (path_len == -1)

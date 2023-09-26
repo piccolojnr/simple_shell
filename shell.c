@@ -117,6 +117,7 @@ int start_process(t_info *info)
                 ffree(info->cmds);
                 continue;
             }
+
             fork_status = fork_command(info);
             ffree(info->cmds);
             free(info->path);
